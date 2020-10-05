@@ -1,0 +1,210 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>utilities.correlation_matrix_generator &#8212; DatasetGenerator 1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for utilities.correlation_matrix_generator</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">random_correlation</span>
+<span class="kn">import</span> <span class="nn">numba</span>
+<span class="kn">from</span> <span class="nn">numba</span> <span class="kn">import</span> <span class="n">jit</span>
+
+
+<div class="viewcode-block" id="Correlation_Matrix_Generator"><a class="viewcode-back" href="../../utilities.html#utilities.correlation_matrix_generator.Correlation_Matrix_Generator">[docs]</a><span class="k">class</span> <span class="nc">Correlation_Matrix_Generator</span><span class="p">():</span>
+
+    <span class="sd">&quot;&quot;&quot; Static class that generates correlation matrix and standard deviations. Useful for many steps that require those generations &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Correlation_Matrix_Generator.gen_corr_matrix"><a class="viewcode-back" href="../../utilities.html#utilities.correlation_matrix_generator.Correlation_Matrix_Generator.gen_corr_matrix">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">gen_corr_matrix</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="n">n_variables</span><span class="p">,</span> <span class="n">related_vars</span><span class="p">,</span> <span class="n">opt_level</span><span class="o">=</span><span class="s1">&#39;float64&#39;</span><span class="p">):</span>
+        
+        <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">        :param n_variables: number of features</span>
+<span class="sd">        :param related_vars: number of related variables</span>
+<span class="sd">        :param opt_level: str that represent the float type for casting arrays. Can be &#39;float64&#39;, &#39;float32&#39; or &#39;float16&#39;. Default &#39;float64&#39;.</span>
+<span class="sd">        &#39;float64&#39; -&gt; default (no optimization)\n</span>
+<span class="sd">        &#39;float32&#39; -&gt; downcast to float32;\n</span>
+<span class="sd">        &#39;float16&#39; -&gt; downcast to float16</span>
+
+<span class="sd">        Generate a custom correlation matrix, with mixed correlated and incorrelated features</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">random_copy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span> <span class="c1">#copia del seed</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span> <span class="c1"># impostato per random_correlation</span>
+        
+        <span class="k">def</span> <span class="nf">randomize_unrelated_position</span><span class="p">(</span><span class="n">random_copy</span><span class="p">,</span> <span class="n">matrix</span><span class="p">,</span> <span class="n">n_variables</span><span class="p">,</span> <span class="n">related_vars</span><span class="p">):</span>
+            <span class="n">indice_massimo_inserimento</span> <span class="o">=</span> <span class="n">related_vars</span> <span class="o">-</span> <span class="mi">1</span> <span class="c1">#indice ultima riga senza zeri</span>
+            <span class="n">indice_massimo</span> <span class="o">=</span> <span class="n">n_variables</span> <span class="o">-</span> <span class="mi">1</span> <span class="c1">#indice ultima riga</span>
+
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_variables</span> <span class="o">-</span> <span class="n">related_vars</span><span class="p">):</span>
+                <span class="n">rand</span> <span class="o">=</span> <span class="n">random_copy</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">indice_massimo</span><span class="p">)</span>
+                
+                <span class="k">if</span><span class="p">(</span><span class="n">rand</span> <span class="o">&lt;=</span> <span class="n">indice_massimo_inserimento</span><span class="p">):</span>
+                    <span class="n">index</span> <span class="o">=</span> <span class="n">indice_massimo</span> 
+                    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_variables</span><span class="p">):</span> 
+                        <span class="k">while</span> <span class="n">index</span> <span class="o">&gt;=</span> <span class="n">rand</span> <span class="p">:</span>
+                            <span class="k">if</span> <span class="n">index</span> <span class="o">&gt;</span> <span class="n">rand</span> <span class="p">:</span>
+                                <span class="n">matrix</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                            <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="n">rand</span> <span class="p">:</span>
+                                <span class="n">matrix</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                            <span class="n">index</span> <span class="o">=</span> <span class="n">index</span> <span class="o">-</span> <span class="mi">1</span>
+                        <span class="n">index</span> <span class="o">=</span> <span class="n">indice_massimo</span>  
+                    
+                    <span class="n">index</span> <span class="o">=</span> <span class="n">indice_massimo</span>
+                    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_variables</span><span class="p">):</span>
+                        <span class="k">while</span> <span class="n">index</span> <span class="o">&gt;=</span> <span class="n">rand</span> <span class="p">:</span>
+                            <span class="k">if</span> <span class="n">index</span> <span class="o">&gt;</span> <span class="n">rand</span> <span class="p">:</span>
+                                <span class="n">matrix</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">matrix</span><span class="p">[</span><span class="n">index</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span>
+                            <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="n">rand</span> <span class="p">:</span>
+                                <span class="n">matrix</span><span class="p">[</span><span class="n">index</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                            <span class="n">index</span> <span class="o">=</span> <span class="n">index</span> <span class="o">-</span> <span class="mi">1</span>
+                        <span class="n">index</span> <span class="o">=</span> <span class="n">indice_massimo</span>
+                        
+                    <span class="n">matrix</span><span class="p">[</span><span class="n">rand</span><span class="p">,</span> <span class="n">rand</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="n">indice_massimo_inserimento</span> <span class="o">=</span> <span class="n">indice_massimo_inserimento</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="n">matrix</span>
+        
+        <span class="c1"># eigenvalues (la somma è uguale alla dimensione della matrice)</span>
+        <span class="n">rand_nums</span> <span class="o">=</span> <span class="p">[</span><span class="n">random_copy</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span><span class="mf">1.5</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">related_vars</span><span class="p">)]</span>
+        <span class="n">eigenvalues</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">num</span> <span class="ow">in</span> <span class="n">rand_nums</span> <span class="p">:</span>
+            <span class="n">eigenvalues</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">num</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">rand_nums</span><span class="p">))</span><span class="o">*</span><span class="n">related_vars</span><span class="p">)</span>
+        
+        <span class="n">correlation_matrix_part</span> <span class="o">=</span> <span class="n">random_correlation</span><span class="o">.</span><span class="n">rvs</span><span class="p">(</span><span class="n">eigenvalues</span><span class="p">)</span> <span class="c1"># based on np.random.seed</span>
+        
+        <span class="n">correlation_matrix_zeros_high_indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_variables</span><span class="p">,)</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">fill_diagonal</span><span class="p">(</span><span class="n">correlation_matrix_zeros_high_indices</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_variables</span><span class="p">)])</span>
+        <span class="n">correlation_matrix_zeros_high_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">related_vars</span><span class="p">,</span><span class="mi">0</span><span class="p">:</span><span class="n">related_vars</span><span class="p">]</span> <span class="o">=</span> <span class="n">correlation_matrix_part</span>
+        
+        <span class="n">correlation_matrix_x</span> <span class="o">=</span> <span class="n">randomize_unrelated_position</span><span class="p">(</span><span class="n">random_copy</span><span class="p">,</span> <span class="n">correlation_matrix_zeros_high_indices</span><span class="p">,</span> <span class="n">n_variables</span><span class="p">,</span> <span class="n">related_vars</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">correlation_matrix_x</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;float64&#39;</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Correlation_Matrix_Generator.gen_standard_devs"><a class="viewcode-back" href="../../utilities.html#utilities.correlation_matrix_generator.Correlation_Matrix_Generator.gen_standard_devs">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">gen_standard_devs</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="n">n_variables</span><span class="p">,</span> <span class="n">related_vars</span><span class="p">,</span> <span class="n">n_scales</span><span class="p">,</span> <span class="n">opt_level</span><span class="o">=</span><span class="s1">&#39;float64&#39;</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param n_variables: number of features</span>
+<span class="sd">        :param related_vars: number of related variables</span>
+<span class="sd">        :param n_scales: number of scales</span>
+<span class="sd">        :param opt_level: str that represent the float type for casting arrays. Can be &#39;float64&#39;, &#39;float32&#39; or &#39;float16&#39;. Default &#39;float64&#39;</span>
+<span class="sd">        </span>
+<span class="sd">        Notes</span>
+<span class="sd">        ------</span>
+<span class="sd">        </span>
+<span class="sd">        &#39;float64&#39; -&gt; default (no optimization)\n</span>
+<span class="sd">        &#39;float32&#39; -&gt; downcast to float32\n</span>
+<span class="sd">        &#39;float16&#39; -&gt; downcast to float16</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+
+        <span class="n">variance_scales</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">5</span><span class="p">,</span><span class="mi">10</span><span class="p">],[</span><span class="mi">10</span><span class="p">,</span><span class="mi">20</span><span class="p">],[</span><span class="mi">100</span><span class="p">,</span><span class="mi">200</span><span class="p">],[</span><span class="mi">1000</span><span class="p">,</span><span class="mi">2000</span><span class="p">]]</span>
+    
+        <span class="c1">#Calculate number of unrelated variables</span>
+        <span class="n">unrelated_vars</span> <span class="o">=</span> <span class="n">n_variables</span> <span class="o">-</span> <span class="n">related_vars</span>
+        
+        <span class="c1">#n_vars_scale: list with two lists, # of varaibles with the same scale </span>
+        <span class="c1">#(at half list you have to repeat (related first, unrelated second))</span>
+        <span class="n">n_vars_scale_inner</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">related_vars</span><span class="p">,</span><span class="n">unrelated_vars</span><span class="p">:</span>
+            <span class="n">n1</span><span class="p">,</span><span class="n">n2</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="n">n_scales</span><span class="p">)</span>
+            <span class="n">n_vars_scale_inner</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">n1</span><span class="o">+</span><span class="n">n2</span> <span class="k">if</span> <span class="n">pos</span><span class="o">==</span><span class="mi">0</span> <span class="k">else</span> <span class="n">n1</span> <span class="k">for</span> <span class="n">pos</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_scales</span><span class="p">)])</span>
+        <span class="n">n_vars_scale</span> <span class="o">=</span> <span class="p">[</span><span class="n">val</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">n_vars_scale_inner</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">sublist</span><span class="p">]</span>
+        
+        <span class="c1">#Generate vector of standard deviations of the Variables</span>
+        <span class="n">stdevs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">variance_scales</span><span class="p">[</span><span class="n">pos</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                                                        <span class="n">variance_scales</span><span class="p">[</span><span class="n">pos</span><span class="p">][</span><span class="mi">1</span><span class="p">]),</span><span class="mi">1</span><span class="p">))</span> 
+        <span class="k">for</span> <span class="n">pos</span><span class="p">,</span><span class="n">rep</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">n_vars_scale</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)))</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span><span class="n">n_vars_scale</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">rep</span><span class="p">)])</span>
+        <span class="n">stdevs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">stdevs</span><span class="p">)[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">stdevs</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">opt_level</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>      </div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">DatasetGenerator</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Jacopo Maccaferri, Giorgio Visani, Carlo Cannarsa.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

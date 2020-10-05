@@ -1,0 +1,146 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>model &#8212; DatasetGenerator 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="model">
+<h1>model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="abstract_classes.html">abstract_classes package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="abstract_classes.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="abstract_classes.html#module-abstract_classes.dgp_generator">abstract_classes.dgp_generator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="abstract_classes.html#module-abstract_classes.dgp_params">abstract_classes.dgp_params module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="abstract_classes.html#module-abstract_classes.dgp_results">abstract_classes.dgp_results module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="abstract_classes.html#module-abstract_classes.dgp_results_saver">abstract_classes.dgp_results_saver module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="abstract_classes.html#module-abstract_classes.dgp_sanity_check">abstract_classes.dgp_sanity_check module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="abstract_classes.html#module-abstract_classes">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="implementation_log.html">implementation_log package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementation_log.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementation_log.html#module-implementation_log.log_generator">implementation_log.log_generator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementation_log.html#module-implementation_log.log_params">implementation_log.log_params module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementation_log.html#module-implementation_log.log_results">implementation_log.log_results module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementation_log.html#module-implementation_log">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="implementation_lr.html">implementation_lr package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="implementation_lr.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementation_lr.html#module-implementation_lr.lr_generator">implementation_lr.lr_generator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementation_lr.html#module-implementation_lr.lr_params">implementation_lr.lr_params module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementation_lr.html#module-implementation_lr.lr_results">implementation_lr.lr_results module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="implementation_lr.html#module-implementation_lr">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="simple_access.html">simple_access package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="simple_access.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simple_access.html#module-simple_access.functions">simple_access.functions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simple_access.html#module-simple_access">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="utilities.html">utilities package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="utilities.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utilities.html#module-utilities.byte_formatter">utilities.byte_formatter module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utilities.html#module-utilities.correlation_matrix_generator">utilities.correlation_matrix_generator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utilities.html#module-utilities.csv_saver">utilities.csv_saver module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utilities.html#module-utilities.gen_details">utilities.gen_details module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utilities.html#module-utilities.sanity_check">utilities.sanity_check module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utilities.html#module-utilities">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">DatasetGenerator</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Jacopo Maccaferri, Giorgio Visani, Carlo Cannarsa.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/modules.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

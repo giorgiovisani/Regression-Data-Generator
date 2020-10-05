@@ -1,0 +1,251 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>abstract_classes package &#8212; DatasetGenerator 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="abstract-classes-package">
+<h1>abstract_classes package<a class="headerlink" href="#abstract-classes-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-abstract_classes.dgp_generator">
+<span id="abstract-classes-dgp-generator-module"></span><h2>abstract_classes.dgp_generator module<a class="headerlink" href="#module-abstract_classes.dgp_generator" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="abstract_classes.dgp_generator.DGP_Chunk_Generator">
+<em class="property">class </em><code class="sig-prename descclassname">abstract_classes.dgp_generator.</code><code class="sig-name descname">DGP_Chunk_Generator</code><a class="reference internal" href="_modules/abstract_classes/dgp_generator.html#DGP_Chunk_Generator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abstract_classes.dgp_generator.DGP_Chunk_Generator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>An abstract class that provide dataset generation chunk by chunk</p>
+<dl class="method">
+<dt id="abstract_classes.dgp_generator.DGP_Chunk_Generator.generate_dataset">
+<em class="property">abstract </em><code class="sig-name descname">generate_dataset</code><span class="sig-paren">(</span><em class="sig-param">params</em>, <em class="sig-param">saver</em>, <em class="sig-param">chunks</em>, <em class="sig-param">opt_level='float64'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/abstract_classes/dgp_generator.html#DGP_Chunk_Generator.generate_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abstract_classes.dgp_generator.DGP_Chunk_Generator.generate_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>You have not to assign this method to a variable, because it doesn’t mantain anything in memory
+:param params: instance of LR_Params
+:param saver: child of class Result_Saver. It specifies which saver will be used (for future implementations)
+:param chunks: int, number of chunks that the dataset will have. It represents the number of total iterations</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="abstract_classes.dgp_generator.DGP_Generator">
+<em class="property">class </em><code class="sig-prename descclassname">abstract_classes.dgp_generator.</code><code class="sig-name descname">DGP_Generator</code><a class="reference internal" href="_modules/abstract_classes/dgp_generator.html#DGP_Generator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abstract_classes.dgp_generator.DGP_Generator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>An abstract class that provide dataset generation</p>
+<dl class="method">
+<dt id="abstract_classes.dgp_generator.DGP_Generator.generate_dataset">
+<em class="property">abstract </em><code class="sig-name descname">generate_dataset</code><span class="sig-paren">(</span><em class="sig-param">params</em>, <em class="sig-param">opt_level='float64'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/abstract_classes/dgp_generator.html#DGP_Generator.generate_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abstract_classes.dgp_generator.DGP_Generator.generate_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>params</strong> – instance of a class that represents params for DGP (like model.implementation_log.lr_params LR_Params)</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>instance of class DGP_Results</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-abstract_classes.dgp_params">
+<span id="abstract-classes-dgp-params-module"></span><h2>abstract_classes.dgp_params module<a class="headerlink" href="#module-abstract_classes.dgp_params" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="abstract_classes.dgp_params.DGP_Params">
+<em class="property">class </em><code class="sig-prename descclassname">abstract_classes.dgp_params.</code><code class="sig-name descname">DGP_Params</code><span class="sig-paren">(</span><em class="sig-param">seed=None</em>, <em class="sig-param">n_variables=None</em>, <em class="sig-param">error_variance=None</em>, <em class="sig-param">n_points=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/abstract_classes/dgp_params.html#DGP_Params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abstract_classes.dgp_params.DGP_Params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>An abstract class for DGP params</p>
+<dl class="method">
+<dt id="abstract_classes.dgp_params.DGP_Params.validate_params">
+<code class="sig-name descname">validate_params</code><span class="sig-paren">(</span><em class="sig-param">seed=None</em>, <em class="sig-param">n_variables=None</em>, <em class="sig-param">error_variance=None</em>, <em class="sig-param">n_points=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/abstract_classes/dgp_params.html#DGP_Params.validate_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abstract_classes.dgp_params.DGP_Params.validate_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-abstract_classes.dgp_results">
+<span id="abstract-classes-dgp-results-module"></span><h2>abstract_classes.dgp_results module<a class="headerlink" href="#module-abstract_classes.dgp_results" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="abstract_classes.dgp_results.DGP_Results">
+<em class="property">class </em><code class="sig-prename descclassname">abstract_classes.dgp_results.</code><code class="sig-name descname">DGP_Results</code><span class="sig-paren">(</span><em class="sig-param">features=None</em>, <em class="sig-param">response=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/abstract_classes/dgp_results.html#DGP_Results"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abstract_classes.dgp_results.DGP_Results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>An abstract class for DGP Results</p>
+<dl class="method">
+<dt id="abstract_classes.dgp_results.DGP_Results.validate_results">
+<code class="sig-name descname">validate_results</code><span class="sig-paren">(</span><em class="sig-param">features=None</em>, <em class="sig-param">response=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/abstract_classes/dgp_results.html#DGP_Results.validate_results"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abstract_classes.dgp_results.DGP_Results.validate_results" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-abstract_classes.dgp_results_saver">
+<span id="abstract-classes-dgp-results-saver-module"></span><h2>abstract_classes.dgp_results_saver module<a class="headerlink" href="#module-abstract_classes.dgp_results_saver" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="abstract_classes.dgp_results_saver.DGP_Results_Saver">
+<em class="property">class </em><code class="sig-prename descclassname">abstract_classes.dgp_results_saver.</code><code class="sig-name descname">DGP_Results_Saver</code><span class="sig-paren">(</span><em class="sig-param">dir_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/abstract_classes/dgp_results_saver.html#DGP_Results_Saver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abstract_classes.dgp_results_saver.DGP_Results_Saver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>An abstract class that provide different saving methods</p>
+<dl class="method">
+<dt id="abstract_classes.dgp_results_saver.DGP_Results_Saver.save_all">
+<em class="property">abstract </em><code class="sig-name descname">save_all</code><span class="sig-paren">(</span><em class="sig-param">params=None</em>, <em class="sig-param">result=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/abstract_classes/dgp_results_saver.html#DGP_Results_Saver.save_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abstract_classes.dgp_results_saver.DGP_Results_Saver.save_all" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>params</strong> – DGP_Params instance that will be saved</p></li>
+<li><p><strong>result</strong> – DGP_Tesults instance that will be saved</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="abstract_classes.dgp_results_saver.DGP_Results_Saver.save_dataframe">
+<em class="property">abstract </em><code class="sig-name descname">save_dataframe</code><span class="sig-paren">(</span><em class="sig-param">dataframe</em>, <em class="sig-param">filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/abstract_classes/dgp_results_saver.html#DGP_Results_Saver.save_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abstract_classes.dgp_results_saver.DGP_Results_Saver.save_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframe</strong> – pandas.Dataframe that will be saved</p></li>
+<li><p><strong>filename</strong> – filename where file will be saved</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-abstract_classes.dgp_sanity_check">
+<span id="abstract-classes-dgp-sanity-check-module"></span><h2>abstract_classes.dgp_sanity_check module<a class="headerlink" href="#module-abstract_classes.dgp_sanity_check" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="abstract_classes.dgp_sanity_check.DGP_Sanity_Check">
+<em class="property">class </em><code class="sig-prename descclassname">abstract_classes.dgp_sanity_check.</code><code class="sig-name descname">DGP_Sanity_Check</code><a class="reference internal" href="_modules/abstract_classes/dgp_sanity_check.html#DGP_Sanity_Check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abstract_classes.dgp_sanity_check.DGP_Sanity_Check" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>An abstract class for various statistic tests on dataset</p>
+<dl class="method">
+<dt id="abstract_classes.dgp_sanity_check.DGP_Sanity_Check.plot_autocorr_function">
+<em class="property">abstract </em><code class="sig-name descname">plot_autocorr_function</code><span class="sig-paren">(</span><em class="sig-param">features</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/abstract_classes/dgp_sanity_check.html#DGP_Sanity_Check.plot_autocorr_function"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abstract_classes.dgp_sanity_check.DGP_Sanity_Check.plot_autocorr_function" title="Permalink to this definition">¶</a></dt>
+<dd><p>Autocorrelation function for 20 lags</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="abstract_classes.dgp_sanity_check.DGP_Sanity_Check.plot_density_hist">
+<em class="property">abstract </em><code class="sig-name descname">plot_density_hist</code><span class="sig-paren">(</span><em class="sig-param">features</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/abstract_classes/dgp_sanity_check.html#DGP_Sanity_Check.plot_density_hist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abstract_classes.dgp_sanity_check.DGP_Sanity_Check.plot_density_hist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Histogram of density</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="abstract_classes.dgp_sanity_check.DGP_Sanity_Check.plot_p2p_indip">
+<em class="property">abstract </em><code class="sig-name descname">plot_p2p_indip</code><span class="sig-paren">(</span><em class="sig-param">features</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/abstract_classes/dgp_sanity_check.html#DGP_Sanity_Check.plot_p2p_indip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abstract_classes.dgp_sanity_check.DGP_Sanity_Check.plot_p2p_indip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Independence between variables 2-2</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="abstract_classes.dgp_sanity_check.DGP_Sanity_Check.plot_spearman_correlation">
+<em class="property">abstract </em><code class="sig-name descname">plot_spearman_correlation</code><span class="sig-paren">(</span><em class="sig-param">features</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/abstract_classes/dgp_sanity_check.html#DGP_Sanity_Check.plot_spearman_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abstract_classes.dgp_sanity_check.DGP_Sanity_Check.plot_spearman_correlation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Spearman correlation</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="abstract_classes.dgp_sanity_check.DGP_Sanity_Check.plot_value_indip">
+<em class="property">abstract </em><code class="sig-name descname">plot_value_indip</code><span class="sig-paren">(</span><em class="sig-param">features</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/abstract_classes/dgp_sanity_check.html#DGP_Sanity_Check.plot_value_indip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#abstract_classes.dgp_sanity_check.DGP_Sanity_Check.plot_value_indip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot each value against the subsequent one</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-abstract_classes">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-abstract_classes" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">DatasetGenerator</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Jacopo Maccaferri, Giorgio Visani, Carlo Cannarsa.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/abstract_classes.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

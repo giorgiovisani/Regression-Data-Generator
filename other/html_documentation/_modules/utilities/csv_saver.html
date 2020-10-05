@@ -1,0 +1,222 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>utilities.csv_saver &#8212; DatasetGenerator 1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for utilities.csv_saver</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">path</span> 
+<span class="kn">import</span> <span class="nn">json</span>
+
+<span class="kn">from</span> <span class="nn">abstract_classes.dgp_generator</span> <span class="kn">import</span> <span class="n">DGP_Generator</span>
+<span class="kn">from</span> <span class="nn">abstract_classes.dgp_results_saver</span> <span class="kn">import</span> <span class="n">DGP_Results_Saver</span>
+
+<span class="kn">from</span> <span class="nn">utilities.correlation_matrix_generator</span> <span class="kn">import</span> <span class="n">Correlation_Matrix_Generator</span>
+<span class="kn">from</span> <span class="nn">utilities.sanity_check</span> <span class="kn">import</span> <span class="n">Sanity_Check</span>
+
+<span class="kn">import</span> <span class="nn">multiprocessing</span>
+<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Process</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">csv</span>
+
+<div class="viewcode-block" id="Csv_Results_Saver"><a class="viewcode-back" href="../../utilities.html#utilities.csv_saver.Csv_Results_Saver">[docs]</a><span class="k">class</span> <span class="nc">Csv_Results_Saver</span><span class="p">(</span><span class="n">DGP_Results_Saver</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot; Implementation of DGP_Result_Saver, useful to save various .csv files from generated results &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dir_path</span><span class="p">):</span> <span class="c1"># dir_path: percorso della cartella in cui si vogliono salvare i dati</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param: dir_path: path of the chosen directory where files will be saved</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dir_path</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Csv_Results_Saver.save_all"><a class="viewcode-back" href="../../utilities.html#utilities.csv_saver.Csv_Results_Saver.save_all">[docs]</a>    <span class="k">def</span> <span class="nf">save_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">result</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">compr_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi_proc</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">feature_analysis</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span> <span class="c1"># salvo i risultati, i parametri e nel caso genero le analisi sulle feature (del Sanity Check)</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param params: object of class DGP_Params</span>
+<span class="sd">        :param result: object of class DGP_Results</span>
+<span class="sd">        :param compression: bool. Set true if you want compression (must not have compr_type = None)</span>
+<span class="sd">        :param compr_type: str that represent the compression type. Works only if compression is set to True. Can be 3 values:\n</span>
+<span class="sd">        &#39;gz&#39; -&gt; using gunzip compression, file will be saved as &lt;filename&gt;.csv.gz\n\t</span>
+<span class="sd">        &#39;bz&#39; -&gt; using bzip compression, file will be saved as &lt;filename&gt;.csv.bz\n\t</span>
+<span class="sd">        &#39;xz&#39; -&gt; using xz compression, file will be saved as &lt;filename&gt;.csv.xz\n</span>
+<span class="sd">        :param verbose: bool, disable if you don&#39;t want verbose output</span>
+<span class="sd">        :param multi_proc: bool, works only if feature_analysis is true. If set to true executes all tasks with multiprocessing (experimental)</span>
+<span class="sd">        :param feature_analysis: if true, will save also analysis on the features</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+            <span class="c1"># in dataset.csv gli indici sono 0,0,1,2,3,4 e non 0,1,2,3,4,5 perche pd.Concat() concatena anche gli indici oltre ai dati</span>
+            <span class="c1"># siccome la Y ha 1 colonna (quindi solo index 0) e la X ne ha un tot allora viene ripetuto lo 0 della X concatenato allo 0 della Y</span>
+            <span class="c1"># risolvo con dataframe.columns = range(dataframe.shape[1])</span>
+
+        <span class="k">if</span> <span class="n">compression</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">compr_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;bz&#39;</span><span class="p">,</span> <span class="s1">&#39;gz&#39;</span><span class="p">,</span> <span class="s1">&#39;xz&#39;</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Parameter &#39;compr_type&#39; is not valid&quot;</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">compression</span><span class="p">:</span>
+            <span class="n">dataset_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_path</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">dataset.csv&quot;</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">compr_type</span>
+            <span class="n">corr_matr_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_path</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">corr_matrix.csv&quot;</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">compr_type</span>
+            <span class="n">cov_matr_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_path</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">cov_matrix.csv&quot;</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">compr_type</span>
+            <span class="n">betas_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_path</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">betas.csv&quot;</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">compr_type</span>
+            <span class="n">gen_det_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_path</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">gen_details.csv&quot;</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">compr_type</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dataset_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_path</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">dataset.csv&quot;</span>
+            <span class="n">corr_matr_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_path</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">corr_matrix.csv&quot;</span>
+            <span class="n">cov_matr_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_path</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">cov_matrix.csv&quot;</span>
+            <span class="n">betas_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_path</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">betas.csv&quot;</span>
+            <span class="n">gen_det_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_path</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">gen_details.csv&quot;</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Data will be stored in </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dir_path</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">params</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">params</span><span class="o">.</span><span class="n">betas</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">betas_filename</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        
+
+        <span class="k">if</span> <span class="n">result</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>    
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Must enter &#39;result&#39; param&quot;</span><span class="p">)</span> 
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">result</span><span class="o">.</span><span class="n">response</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">features</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">dataset</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="c1"># resetting indexes</span>
+            
+            <span class="n">dataset</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">dataset_filename</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            
+            <span class="n">result</span><span class="o">.</span><span class="n">cov_matrix</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">cov_matr_filename</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            
+            <span class="n">result</span><span class="o">.</span><span class="n">corr_matrix</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">corr_matr_filename</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+            <span class="n">gen_dict</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">gen_dict</span><span class="p">[</span><span class="s1">&#39;Start time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">gen_details</span><span class="o">.</span><span class="n">start_ts</span>
+            <span class="n">gen_dict</span><span class="p">[</span><span class="s1">&#39;End time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">gen_details</span><span class="o">.</span><span class="n">end_ts</span>
+            <span class="n">gen_dict</span><span class="p">[</span><span class="s1">&#39;Elapsed time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">gen_details</span><span class="o">.</span><span class="n">end_ts</span> <span class="o">-</span> <span class="n">result</span><span class="o">.</span><span class="n">gen_details</span><span class="o">.</span><span class="n">start_ts</span>
+            <span class="n">gen_dict</span><span class="p">[</span><span class="s1">&#39;OS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">gen_details</span><span class="o">.</span><span class="n">platform_name</span>
+            <span class="n">gen_dict</span><span class="p">[</span><span class="s1">&#39;User&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">gen_details</span><span class="o">.</span><span class="n">user</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">gen_dict</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">gen_det_filename</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="n">feature_analysis</span><span class="p">:</span> <span class="c1"># creo cartella &quot;Sanity Checks&quot; nel path: &lt;base_path&gt; --&gt; Saves_&lt;dirname&gt; --&gt; </span>
+                <span class="n">sanity_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_path</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">Sanity_Checks&quot;</span>
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Storing sanity checks in </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sanity_path</span><span class="p">))</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">sanity_path</span><span class="p">):</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">sanity_path</span><span class="p">)</span>
+                <span class="c1"># save sanity checks</span>
+                <span class="n">fa</span> <span class="o">=</span> <span class="n">Sanity_Check</span><span class="p">()</span> <span class="c1"># feature analyzer</span>
+                <span class="n">fa</span><span class="o">.</span><span class="n">plot_all</span><span class="p">(</span><span class="n">features</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">features</span><span class="p">,</span> <span class="n">dir_path</span><span class="o">=</span><span class="n">sanity_path</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">multi_proc</span><span class="o">=</span><span class="n">multi_proc</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Csv_Results_Saver.save_dataframe"><a class="viewcode-back" href="../../utilities.html#utilities.csv_saver.Csv_Results_Saver.save_dataframe">[docs]</a>    <span class="k">def</span> <span class="nf">save_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataframe</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param df: pandas.Dataframe that will be saved</span>
+<span class="sd">        :param filename: filename where file will be saved</span>
+<span class="sd">        :param mode: &#39;w&#39; for writing, &#39;a&#39; for append. Default &#39;w&#39;</span>
+<span class="sd">        :param index: bool, save index of dataframe</span>
+<span class="sd">        :param header: bool, save header of dataframe</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Path is required&quot;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Path is required&quot;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_path</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">filename</span>
+
+        <span class="n">dataframe</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="n">header</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="n">sep</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">DatasetGenerator</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Jacopo Maccaferri, Giorgio Visani, Carlo Cannarsa.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

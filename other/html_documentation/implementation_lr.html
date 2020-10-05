@@ -1,0 +1,212 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>implementation_lr package &#8212; DatasetGenerator 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="implementation-lr-package">
+<h1>implementation_lr package<a class="headerlink" href="#implementation-lr-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-implementation_lr.lr_generator">
+<span id="implementation-lr-lr-generator-module"></span><h2>implementation_lr.lr_generator module<a class="headerlink" href="#module-implementation_lr.lr_generator" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="implementation_lr.lr_generator.LR_Chunk_Generator">
+<em class="property">class </em><code class="sig-prename descclassname">implementation_lr.lr_generator.</code><code class="sig-name descname">LR_Chunk_Generator</code><a class="reference internal" href="_modules/implementation_lr/lr_generator.html#LR_Chunk_Generator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementation_lr.lr_generator.LR_Chunk_Generator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="abstract_classes.html#abstract_classes.dgp_generator.DGP_Chunk_Generator" title="abstract_classes.dgp_generator.DGP_Chunk_Generator"><code class="xref py py-class docutils literal notranslate"><span class="pre">abstract_classes.dgp_generator.DGP_Chunk_Generator</span></code></a></p>
+<p>Implementation of DGP_Generator, used for Linear Regression.
+Its functions generate dataset chunk by chunk with optimization level, for memory saving</p>
+<dl class="method">
+<dt id="implementation_lr.lr_generator.LR_Chunk_Generator.generate_dataset">
+<code class="sig-name descname">generate_dataset</code><span class="sig-paren">(</span><em class="sig-param">params</em>, <em class="sig-param">saver</em>, <em class="sig-param">chunks=1</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">opt_level='float64'</em>, <em class="sig-param">compression=False</em>, <em class="sig-param">compr_type=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/implementation_lr/lr_generator.html#LR_Chunk_Generator.generate_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementation_lr.lr_generator.LR_Chunk_Generator.generate_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>params</strong> – instance of LR_Params</p></li>
+<li><p><strong>chunks</strong> – int, number of chunks that the dataset will have. It represents the number of total iterations</p></li>
+<li><p><strong>verbose</strong> – verbose output</p></li>
+<li><p><strong>opt_level</strong> – str that represent the float type for casting arrays. Can be ‘float64’, ‘float32’ or ‘float16’. Default ‘float64’</p></li>
+</ul>
+</dd>
+</dl>
+<p>‘float64’ -&gt; default (no optimization)</p>
+<p>‘float32’ -&gt; downcast to float32</p>
+<p>‘float16’ -&gt; downcast to float16</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>compression</strong> – bool. Set true if you want compression (must not have compr_type = None)</p></li>
+<li><p><strong>compr_type</strong> – str that represent the compression type. Works only if compression is set to True. Can be 3 values:</p></li>
+</ul>
+</dd>
+</dl>
+<p>‘gz’ -&gt; using gunzip compression, file will be saved as &lt;filename&gt;.csv.gz</p>
+<p>‘bz’ -&gt; using bzip compression, file will be saved as &lt;filename&gt;.csv.bz</p>
+<p>‘xz’ -&gt; using xz compression, file will be saved as &lt;filename&gt;.csv.xz</p>
+<p>You may not assign this method to a variable, because it doesn’t mantain anything in memory</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="implementation_lr.lr_generator.LR_Generator">
+<em class="property">class </em><code class="sig-prename descclassname">implementation_lr.lr_generator.</code><code class="sig-name descname">LR_Generator</code><a class="reference internal" href="_modules/implementation_lr/lr_generator.html#LR_Generator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementation_lr.lr_generator.LR_Generator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="abstract_classes.html#abstract_classes.dgp_generator.DGP_Generator" title="abstract_classes.dgp_generator.DGP_Generator"><code class="xref py py-class docutils literal notranslate"><span class="pre">abstract_classes.dgp_generator.DGP_Generator</span></code></a></p>
+<p>Implementation of DGP_Generator, used for Linear Regression.
+Its functions generate dataset with optimization level, for memory saving
+see dgpy.lr_generator.LR_Chunk_Generator for dataset generation chunk by chunk</p>
+<dl class="method">
+<dt id="implementation_lr.lr_generator.LR_Generator.generate_dataset">
+<code class="sig-name descname">generate_dataset</code><span class="sig-paren">(</span><em class="sig-param">params</em>, <em class="sig-param">opt_level='float64'</em>, <em class="sig-param">verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/implementation_lr/lr_generator.html#LR_Generator.generate_dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementation_lr.lr_generator.LR_Generator.generate_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>params</strong> – instance of LR_Params</p></li>
+<li><p><strong>verbose</strong> – verbose output</p></li>
+<li><p><strong>opt_level</strong> – <p>str that represent the float type for casting arrays. Can be ‘float64’, ‘float32’ or ‘float16’. Default ‘float64’</p>
+<p>’float64’ -&gt; default (no optimization)</p>
+<p>’float32’ -&gt; downcast to float32</p>
+<p>’float16’ -&gt; downcast to float16</p>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>instance of class DGP_Results</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-implementation_lr.lr_params">
+<span id="implementation-lr-lr-params-module"></span><h2>implementation_lr.lr_params module<a class="headerlink" href="#module-implementation_lr.lr_params" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="implementation_lr.lr_params.LR_Params">
+<em class="property">class </em><code class="sig-prename descclassname">implementation_lr.lr_params.</code><code class="sig-name descname">LR_Params</code><span class="sig-paren">(</span><em class="sig-param">seed=None</em>, <em class="sig-param">n_variables=None</em>, <em class="sig-param">error_variance=None</em>, <em class="sig-param">n_points=None</em>, <em class="sig-param">related_vars=None</em>, <em class="sig-param">n_scales=None</em>, <em class="sig-param">requested_mean=None</em>, <em class="sig-param">unuseful_vars=None</em>, <em class="sig-param">betas=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/implementation_lr/lr_params.html#LR_Params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementation_lr.lr_params.LR_Params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="abstract_classes.html#abstract_classes.dgp_params.DGP_Params" title="abstract_classes.dgp_params.DGP_Params"><code class="xref py py-class docutils literal notranslate"><span class="pre">abstract_classes.dgp_params.DGP_Params</span></code></a></p>
+<p>Inplementation of DGP_Params, used for Linear Regression Data Generating Process</p>
+<dl class="method">
+<dt id="implementation_lr.lr_params.LR_Params.initialize_randomization">
+<code class="sig-name descname">initialize_randomization</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/implementation_lr/lr_params.html#LR_Params.initialize_randomization"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementation_lr.lr_params.LR_Params.initialize_randomization" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="implementation_lr.lr_params.LR_Params.validate_params_and_create_obj">
+<code class="sig-name descname">validate_params_and_create_obj</code><span class="sig-paren">(</span><em class="sig-param">seed=None</em>, <em class="sig-param">n_variables=None</em>, <em class="sig-param">error_variance=None</em>, <em class="sig-param">n_points=None</em>, <em class="sig-param">related_vars=None</em>, <em class="sig-param">n_scales=None</em>, <em class="sig-param">requested_mean=None</em>, <em class="sig-param">unuseful_vars=None</em>, <em class="sig-param">betas=None</em>, <em class="sig-param">gen_x_means=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/implementation_lr/lr_params.html#LR_Params.validate_params_and_create_obj"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementation_lr.lr_params.LR_Params.validate_params_and_create_obj" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-implementation_lr.lr_results">
+<span id="implementation-lr-lr-results-module"></span><h2>implementation_lr.lr_results module<a class="headerlink" href="#module-implementation_lr.lr_results" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="implementation_lr.lr_results.LR_Results">
+<em class="property">class </em><code class="sig-prename descclassname">implementation_lr.lr_results.</code><code class="sig-name descname">LR_Results</code><span class="sig-paren">(</span><em class="sig-param">features</em>, <em class="sig-param">response</em>, <em class="sig-param">cov_matrix</em>, <em class="sig-param">corr_matrix</em>, <em class="sig-param">gen_details</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/implementation_lr/lr_results.html#LR_Results"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementation_lr.lr_results.LR_Results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="abstract_classes.html#abstract_classes.dgp_results.DGP_Results" title="abstract_classes.dgp_results.DGP_Results"><code class="xref py py-class docutils literal notranslate"><span class="pre">abstract_classes.dgp_results.DGP_Results</span></code></a></p>
+<p>Inplementation of DGP_Results, used for Linear Regression Data Generating Process</p>
+<dl class="method">
+<dt id="implementation_lr.lr_results.LR_Results.validate_results">
+<code class="sig-name descname">validate_results</code><span class="sig-paren">(</span><em class="sig-param">features</em>, <em class="sig-param">response</em>, <em class="sig-param">cov_matrix</em>, <em class="sig-param">corr_matrix</em>, <em class="sig-param">gen_details</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/implementation_lr/lr_results.html#LR_Results.validate_results"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#implementation_lr.lr_results.LR_Results.validate_results" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-implementation_lr">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-implementation_lr" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">DatasetGenerator</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Jacopo Maccaferri, Giorgio Visani, Carlo Cannarsa.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/implementation_lr.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

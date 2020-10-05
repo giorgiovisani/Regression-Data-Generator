@@ -1,0 +1,13 @@
+{
+"type_of_regression": "log",
+"chunk": "True",
+"csv_files": "True",
+"seed": 11,
+"n_variables": 5,
+"error_variance": 0,
+"n_points": 32,
+"related_vars": 3,
+"n_scales": 1,
+"requested_odds": 2,
+"unuseful_vars": 1
+}

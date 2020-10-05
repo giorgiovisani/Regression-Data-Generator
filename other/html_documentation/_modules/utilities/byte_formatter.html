@@ -1,0 +1,120 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>utilities.byte_formatter &#8212; DatasetGenerator 1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for utilities.byte_formatter</h1><div class="highlight"><pre>
+<span></span>
+<div class="viewcode-block" id="ByteFormatter"><a class="viewcode-back" href="../../utilities.html#utilities.byte_formatter.ByteFormatter">[docs]</a><span class="k">class</span> <span class="nc">ByteFormatter</span><span class="p">:</span>
+
+    <span class="sd">&quot;&quot;&quot; Static class that format bytes in a human readable form. Useful for statistics about memory usage &quot;&quot;&quot;</span>
+    
+<div class="viewcode-block" id="ByteFormatter.format_bytes"><a class="viewcode-back" href="../../utilities.html#utilities.byte_formatter.ByteFormatter.format_bytes">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">format_bytes</span><span class="p">(</span><span class="n">B</span><span class="p">):</span> <span class="c1"># format bytes in a human readable form</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+        <span class="n">KB</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span>
+        <span class="n">MB</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">KB</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="c1"># 1,048,576</span>
+        <span class="n">GB</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">KB</span> <span class="o">**</span> <span class="mi">3</span><span class="p">)</span> <span class="c1"># 1,073,741,824</span>
+        <span class="n">TB</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">KB</span> <span class="o">**</span> <span class="mi">4</span><span class="p">)</span> <span class="c1"># 1,099,511,627,776</span>
+
+        <span class="k">if</span> <span class="n">B</span> <span class="o">&lt;</span> <span class="n">KB</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{0}</span><span class="s1"> </span><span class="si">{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">B</span><span class="p">,</span><span class="s1">&#39;Bytes&#39;</span> <span class="k">if</span> <span class="mi">0</span> <span class="o">==</span> <span class="n">B</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="s1">&#39;Bytes&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">KB</span> <span class="o">&lt;=</span> <span class="n">B</span> <span class="o">&lt;</span> <span class="n">MB</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{0:.2f}</span><span class="s1"> KB&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">B</span><span class="o">/</span><span class="n">KB</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">MB</span> <span class="o">&lt;=</span> <span class="n">B</span> <span class="o">&lt;</span> <span class="n">GB</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{0:.2f}</span><span class="s1"> MB&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">B</span><span class="o">/</span><span class="n">MB</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">GB</span> <span class="o">&lt;=</span> <span class="n">B</span> <span class="o">&lt;</span> <span class="n">TB</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{0:.2f}</span><span class="s1"> GB&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">B</span><span class="o">/</span><span class="n">GB</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">TB</span> <span class="o">&lt;=</span> <span class="n">B</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;</span><span class="si">{0:.2f}</span><span class="s1"> TB&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">B</span><span class="o">/</span><span class="n">TB</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">DatasetGenerator</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Jacopo Maccaferri, Giorgio Visani, Carlo Cannarsa.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

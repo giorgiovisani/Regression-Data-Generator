@@ -1,0 +1,388 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>simple_access package &#8212; DatasetGenerator 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="simple-access-package">
+<h1>simple_access package<a class="headerlink" href="#simple-access-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-simple_access.functions">
+<span id="simple-access-functions-module"></span><h2>simple_access.functions module<a class="headerlink" href="#module-simple_access.functions" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="simple_access.functions.Elements">
+<em class="property">class </em><code class="sig-prename descclassname">simple_access.functions.</code><code class="sig-name descname">Elements</code><span class="sig-paren">(</span><em class="sig-param">params</em>, <em class="sig-param">type_of_regression='lr'</em>, <em class="sig-param">chunk=False</em>, <em class="sig-param">opt_level='float64'</em>, <em class="sig-param">verbose=True</em>, <em class="sig-param">output_filepath='./output/temp'</em>, <em class="sig-param">chunks=1</em>, <em class="sig-param">compression=False</em>, <em class="sig-param">compr_type='bz'</em>, <em class="sig-param">csv_files=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simple_access/functions.html#Elements"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_access.functions.Elements" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class for input elements, if a choice is None, it will be replaced with default value</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="simple_access.functions.Generator">
+<em class="property">class </em><code class="sig-prename descclassname">simple_access.functions.</code><code class="sig-name descname">Generator</code><a class="reference internal" href="_modules/simple_access/functions.html#Generator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_access.functions.Generator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Static class that hides the complexity of the Generation Process and gives access to all the features of the library</p>
+<dl class="method">
+<dt id="simple_access.functions.Generator.by_input">
+<em class="property">static </em><code class="sig-name descname">by_input</code><span class="sig-paren">(</span><em class="sig-param">elements</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simple_access/functions.html#Generator.by_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_access.functions.Generator.by_input" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>elements</strong> – instance of Elements</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>instance of class DGP_Results, or nothing. It depends on what kind of generation is specified in the dictionary</p>
+</dd>
+</dl>
+<p>It is really useful just combined with the input method of the class IOfunctions</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="simple_access.functions.Generator.log">
+<em class="property">static </em><code class="sig-name descname">log</code><span class="sig-paren">(</span><em class="sig-param">params</em>, <em class="sig-param">opt_level='float64'</em>, <em class="sig-param">verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simple_access/functions.html#Generator.log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_access.functions.Generator.log" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>params</strong> – instance of Log_Params</p></li>
+<li><p><strong>opt_level</strong> – str that represent the float type for casting arrays. Can be ‘float64’, ‘float32’ or ‘float16’. Default ‘float64’</p></li>
+</ul>
+</dd>
+</dl>
+<p>‘float64’ -&gt; default (no optimization)</p>
+<p>‘float32’ -&gt; downcast to float32</p>
+<p>‘float16’ -&gt; downcast to float16</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>verbose</strong> – verbose output</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>instance of class DGP_Results</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="simple_access.functions.Generator.log_chunk">
+<em class="property">static </em><code class="sig-name descname">log_chunk</code><span class="sig-paren">(</span><em class="sig-param">params</em>, <em class="sig-param">output_filepath='./output/temp'</em>, <em class="sig-param">opt_level='float64'</em>, <em class="sig-param">verbose=True</em>, <em class="sig-param">chunks=1</em>, <em class="sig-param">compression=False</em>, <em class="sig-param">compr_type=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simple_access/functions.html#Generator.log_chunk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_access.functions.Generator.log_chunk" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>params</strong> – instance of Log_Params</p></li>
+<li><p><strong>output_filepath</strong> – </p></li>
+<li><p><strong>opt_level</strong> – str that represent the float type for casting arrays. Can be ‘float64’, ‘float32’ or ‘float16’. Default ‘float64’</p></li>
+</ul>
+</dd>
+</dl>
+<p>‘float64’ -&gt; default (no optimization)</p>
+<p>‘float32’ -&gt; downcast to float32</p>
+<p>‘float16’ -&gt; downcast to float16</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>verbose</strong> – verbose output</p></li>
+<li><p><strong>chunks</strong> – int, number of chunks that the dataset will have. It represents the number of total iterations</p></li>
+<li><p><strong>compression</strong> – bool. Set true if you want compression (must not have compr_type = None)</p></li>
+<li><p><strong>compr_type</strong> – str that represent the compression type. Works only if compression is set to True. Can be 3 values:</p></li>
+</ul>
+</dd>
+</dl>
+<p>‘gz’ -&gt; using gunzip compression, file will be saved as &lt;filename&gt;.csv.gz</p>
+<p>‘bz’ -&gt; using bzip compression, file will be saved as &lt;filename&gt;.csv.bz</p>
+<p>‘xz’ -&gt; using xz compression, file will be saved as &lt;filename&gt;.csv.xz</p>
+<p>You may not assign this method to a variable, because it doesn’t mantain anything in memory</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="simple_access.functions.Generator.log_chunk_separated_params">
+<em class="property">static </em><code class="sig-name descname">log_chunk_separated_params</code><span class="sig-paren">(</span><em class="sig-param">seed=None</em>, <em class="sig-param">n_variables=None</em>, <em class="sig-param">error_variance=None</em>, <em class="sig-param">n_points=None</em>, <em class="sig-param">related_vars=None</em>, <em class="sig-param">n_scales=None</em>, <em class="sig-param">requested_odds=None</em>, <em class="sig-param">unuseful_vars=None</em>, <em class="sig-param">betas=None</em>, <em class="sig-param">output_filepath='./output/temp'</em>, <em class="sig-param">opt_level='float64'</em>, <em class="sig-param">verbose=True</em>, <em class="sig-param">chunks=1</em>, <em class="sig-param">compression=False</em>, <em class="sig-param">compr_type=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simple_access/functions.html#Generator.log_chunk_separated_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_access.functions.Generator.log_chunk_separated_params" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="simple_access.functions.Generator.log_separated_params">
+<em class="property">static </em><code class="sig-name descname">log_separated_params</code><span class="sig-paren">(</span><em class="sig-param">seed=None</em>, <em class="sig-param">n_variables=None</em>, <em class="sig-param">error_variance=None</em>, <em class="sig-param">n_points=None</em>, <em class="sig-param">related_vars=None</em>, <em class="sig-param">n_scales=None</em>, <em class="sig-param">requested_odds=None</em>, <em class="sig-param">unuseful_vars=None</em>, <em class="sig-param">betas=None</em>, <em class="sig-param">opt_level='float64'</em>, <em class="sig-param">verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simple_access/functions.html#Generator.log_separated_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_access.functions.Generator.log_separated_params" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>seed</strong> – int, the seed for initialize random generation. If not set, will be randomized</p></li>
+<li><p><strong>n_variables</strong> – int, number of variables</p></li>
+<li><p><strong>error_variance</strong> – int, error variance of error vector</p></li>
+<li><p><strong>n_points</strong> – int, it represents the number of points that will be generated</p></li>
+<li><p><strong>related_vars</strong> – int, number of related variables</p></li>
+<li><p><strong>n_scales</strong> – int, number of scales</p></li>
+<li><p><strong>requested_odds</strong> – int, odd of vector Y</p></li>
+<li><p><strong>unuseful_vars</strong> – int, number of 0 betas</p></li>
+<li><p><strong>betas</strong> – array. If not set, it will be randomized considering unuseful_vars</p></li>
+<li><p><strong>opt_level</strong> – str that represent the float type for casting arrays. Can be ‘float64’, ‘float32’ or ‘float16’. Default ‘float64’</p></li>
+</ul>
+</dd>
+</dl>
+<p>‘float64’ -&gt; default (no optimization)</p>
+<p>‘float32’ -&gt; downcast to float32</p>
+<p>‘float16’ -&gt; downcast to float16</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>verbose</strong> – verbose output</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>instance of class DGP_Results</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="simple_access.functions.Generator.lr">
+<em class="property">static </em><code class="sig-name descname">lr</code><span class="sig-paren">(</span><em class="sig-param">params</em>, <em class="sig-param">opt_level='float64'</em>, <em class="sig-param">verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simple_access/functions.html#Generator.lr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_access.functions.Generator.lr" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>params</strong> – instance of LR_Params</p></li>
+<li><p><strong>opt_level</strong> – str that represent the float type for casting arrays. Can be ‘float64’, ‘float32’ or ‘float16’. Default ‘float64’</p></li>
+</ul>
+</dd>
+</dl>
+<p>‘float64’ -&gt; default (no optimization)</p>
+<p>‘float32’ -&gt; downcast to float32</p>
+<p>‘float16’ -&gt; downcast to float16</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>verbose</strong> – verbose output</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>instance of class DGP_Results</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="simple_access.functions.Generator.lr_chunk">
+<em class="property">static </em><code class="sig-name descname">lr_chunk</code><span class="sig-paren">(</span><em class="sig-param">params</em>, <em class="sig-param">output_filepath='./output/temp'</em>, <em class="sig-param">opt_level='float64'</em>, <em class="sig-param">verbose=True</em>, <em class="sig-param">chunks=1</em>, <em class="sig-param">compression=False</em>, <em class="sig-param">compr_type=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simple_access/functions.html#Generator.lr_chunk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_access.functions.Generator.lr_chunk" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>params</strong> – instance of LR_Params</p></li>
+<li><p><strong>output_filepath</strong> – </p></li>
+<li><p><strong>opt_level</strong> – str that represent the float type for casting arrays. Can be ‘float64’, ‘float32’ or ‘float16’. Default ‘float64’</p></li>
+</ul>
+</dd>
+</dl>
+<p>‘float64’ -&gt; default (no optimization)</p>
+<p>‘float32’ -&gt; downcast to float32</p>
+<p>‘float16’ -&gt; downcast to float16</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>verbose</strong> – verbose output</p></li>
+<li><p><strong>chunks</strong> – int, number of chunks that the dataset will have. It represents the number of total iterations</p></li>
+<li><p><strong>compression</strong> – bool. Set true if you want compression (must not have compr_type = None)</p></li>
+<li><p><strong>compr_type</strong> – str that represent the compression type. Works only if compression is set to True. Can be 3 values:</p></li>
+</ul>
+</dd>
+</dl>
+<p>‘gz’ -&gt; using gunzip compression, file will be saved as &lt;filename&gt;.csv.gz</p>
+<p>‘bz’ -&gt; using bzip compression, file will be saved as &lt;filename&gt;.csv.bz</p>
+<p>‘xz’ -&gt; using xz compression, file will be saved as &lt;filename&gt;.csv.xz</p>
+<p>You may not assign this method to a variable, because it doesn’t mantain anything in memory</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="simple_access.functions.Generator.lr_chunk_separated_params">
+<em class="property">static </em><code class="sig-name descname">lr_chunk_separated_params</code><span class="sig-paren">(</span><em class="sig-param">seed=None</em>, <em class="sig-param">n_variables=None</em>, <em class="sig-param">error_variance=None</em>, <em class="sig-param">n_points=None</em>, <em class="sig-param">related_vars=None</em>, <em class="sig-param">n_scales=None</em>, <em class="sig-param">requested_mean=None</em>, <em class="sig-param">unuseful_vars=None</em>, <em class="sig-param">betas=None</em>, <em class="sig-param">output_filepath='./output/temp'</em>, <em class="sig-param">opt_level='float64'</em>, <em class="sig-param">verbose=True</em>, <em class="sig-param">chunks=1</em>, <em class="sig-param">compression=False</em>, <em class="sig-param">compr_type=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simple_access/functions.html#Generator.lr_chunk_separated_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_access.functions.Generator.lr_chunk_separated_params" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>seed</strong> – int, the seed for initialize random generation. If not set, will be randomized</p></li>
+<li><p><strong>n_variables</strong> – int, number of variables</p></li>
+<li><p><strong>error_variance</strong> – int, error variance of error vector</p></li>
+<li><p><strong>n_points</strong> – int, it represents the number of points that will be generated</p></li>
+<li><p><strong>related_vars</strong> – int, number of related variables</p></li>
+<li><p><strong>n_scales</strong> – int, number of scales</p></li>
+<li><p><strong>requested_mean</strong> – int, mean of vector Y</p></li>
+<li><p><strong>unuseful_vars</strong> – int, number of 0 betas</p></li>
+<li><p><strong>betas</strong> – array. If not set, it will be randomized considering unuseful_vars</p></li>
+<li><p><strong>output_filepath</strong> – </p></li>
+<li><p><strong>opt_level</strong> – str that represent the float type for casting arrays. Can be ‘float64’, ‘float32’ or ‘float16’. Default ‘float64’</p></li>
+</ul>
+</dd>
+</dl>
+<p>‘float64’ -&gt; default (no optimization)</p>
+<p>‘float32’ -&gt; downcast to float32</p>
+<p>‘float16’ -&gt; downcast to float16</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>verbose</strong> – verbose output</p></li>
+<li><p><strong>chunks</strong> – int, number of chunks that the dataset will have. It represents the number of total iterations</p></li>
+<li><p><strong>compression</strong> – bool. Set true if you want compression (must not have compr_type = None)</p></li>
+<li><p><strong>compr_type</strong> – str that represent the compression type. Works only if compression is set to True. Can be 3 values:</p></li>
+</ul>
+</dd>
+</dl>
+<p>‘gz’ -&gt; using gunzip compression, file will be saved as &lt;filename&gt;.csv.gz</p>
+<p>‘bz’ -&gt; using bzip compression, file will be saved as &lt;filename&gt;.csv.bz</p>
+<p>‘xz’ -&gt; using xz compression, file will be saved as &lt;filename&gt;.csv.xz</p>
+<p>You may not assign this method to a variable, because it doesn’t mantain anything in memory</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="simple_access.functions.Generator.lr_separated_params">
+<em class="property">static </em><code class="sig-name descname">lr_separated_params</code><span class="sig-paren">(</span><em class="sig-param">seed=None</em>, <em class="sig-param">n_variables=None</em>, <em class="sig-param">error_variance=None</em>, <em class="sig-param">n_points=None</em>, <em class="sig-param">related_vars=None</em>, <em class="sig-param">n_scales=None</em>, <em class="sig-param">requested_mean=None</em>, <em class="sig-param">unuseful_vars=None</em>, <em class="sig-param">betas=None</em>, <em class="sig-param">opt_level='float64'</em>, <em class="sig-param">verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simple_access/functions.html#Generator.lr_separated_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_access.functions.Generator.lr_separated_params" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>seed</strong> – int, the seed for initialize random generation. If not set, will be randomized</p></li>
+<li><p><strong>n_variables</strong> – int, number of variables</p></li>
+<li><p><strong>error_variance</strong> – int, error variance of error vector</p></li>
+<li><p><strong>n_points</strong> – int, it represents the number of points that will be generated</p></li>
+<li><p><strong>related_vars</strong> – int, number of related variables</p></li>
+<li><p><strong>n_scales</strong> – int, number of scales</p></li>
+<li><p><strong>requested_mean</strong> – int, mean of vector Y</p></li>
+<li><p><strong>unuseful_vars</strong> – int, number of 0 betas</p></li>
+<li><p><strong>betas</strong> – array. If not set, it will be randomized considering unuseful_vars</p></li>
+<li><p><strong>opt_level</strong> – str that represent the float type for casting arrays. Can be ‘float64’, ‘float32’ or ‘float16’. Default ‘float64’</p></li>
+</ul>
+</dd>
+</dl>
+<p>‘float64’ -&gt; default (no optimization)</p>
+<p>‘float32’ -&gt; downcast to float32</p>
+<p>‘float16’ -&gt; downcast to float16</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>verbose</strong> – verbose output</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>instance of class DGP_Results</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="simple_access.functions.IOfunctions">
+<em class="property">class </em><code class="sig-prename descclassname">simple_access.functions.</code><code class="sig-name descname">IOfunctions</code><a class="reference internal" href="_modules/simple_access/functions.html#IOfunctions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_access.functions.IOfunctions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Static class that help the user to put the correct elements into the generator and to get a correct presentation of results</p>
+<dl class="method">
+<dt id="simple_access.functions.IOfunctions.get_input">
+<em class="property">static </em><code class="sig-name descname">get_input</code><span class="sig-paren">(</span><em class="sig-param">input_file=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simple_access/functions.html#IOfunctions.get_input"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_access.functions.IOfunctions.get_input" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>input_file</strong> – str, path of a .json input file or just the name of a .json file in “./input” folder</p>
+</dd>
+</dl>
+<p>:return instance of Elements, containing all the input elements</p>
+<p>It provides to get and validate input elements (loading these by file or interacting with the user by stdIO)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="simple_access.functions.IOfunctions.manage_output">
+<em class="property">static </em><code class="sig-name descname">manage_output</code><span class="sig-paren">(</span><em class="sig-param">elements</em>, <em class="sig-param">results</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simple_access/functions.html#IOfunctions.manage_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#simple_access.functions.IOfunctions.manage_output" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>elements</strong> – instance of Elements</p></li>
+<li><p><strong>results</strong> – instance of DGP_Results</p></li>
+</ul>
+</dd>
+</dl>
+<p>It provides to print on stdIO and, if needed, to write on files the results</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-simple_access">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-simple_access" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">DatasetGenerator</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Jacopo Maccaferri, Giorgio Visani, Carlo Cannarsa.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/simple_access.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

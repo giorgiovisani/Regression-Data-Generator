@@ -1,0 +1,440 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>utilities.sanity_check &#8212; DatasetGenerator 1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for utilities.sanity_check</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">path</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span>
+<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Process</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">statsmodels.api</span> <span class="k">as</span> <span class="nn">sm</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">from</span> <span class="nn">abstract_classes.dgp_sanity_check</span> <span class="kn">import</span> <span class="n">DGP_Sanity_Check</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<div class="viewcode-block" id="Sanity_Check"><a class="viewcode-back" href="../../utilities.html#utilities.sanity_check.Sanity_Check">[docs]</a><span class="k">class</span> <span class="nc">Sanity_Check</span><span class="p">(</span><span class="n">DGP_Sanity_Check</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+
+<div class="viewcode-block" id="Sanity_Check.plot_value_indip"><a class="viewcode-back" href="../../utilities.html#utilities.sanity_check.Sanity_Check.plot_value_indip">[docs]</a>    <span class="k">def</span> <span class="nf">plot_value_indip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">features</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dir_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">return_figs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span> <span class="c1">#1) plot each value against the subsequent one</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span> <span class="c1"># if value of features is a str will be evaluated as a path</span>
+            <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">features</span><span class="p">):</span> <span class="c1"># check if file exists</span>
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reading features from </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">features</span><span class="p">))</span>
+                <span class="n">features</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+                <span class="n">features</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">features</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># delete Y vector    </span>
+                <span class="n">features</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">features</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="c1"># resetting indexes    </span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;features csv file doesn&#39;t exist&quot;</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param features: pandas Dataframe</span>
+<span class="sd">        :param dir_path: (optional) directory path where to save files</span>
+<span class="sd">        :param return_figs: if set to true will return all the figs. It can consume a lot of memory</span>
+<span class="sd">        :param verbose: disable if you don&#39;t want verbose output</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">figs</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">dir_path</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dir_path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Parameter &#39;dir_path&#39; is not valid&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Plotting value indipendency...&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="n">columnName</span><span class="p">,</span> <span class="n">columnData</span><span class="p">)</span> <span class="ow">in</span> <span class="n">features</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">return_figs</span><span class="p">:</span>
+                <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+            <span class="n">col_data</span> <span class="o">=</span> <span class="n">columnData</span><span class="o">.</span><span class="n">values</span>
+            <span class="n">partial_data_1</span> <span class="o">=</span> <span class="n">col_data</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">col_data</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">partial_data_2</span> <span class="o">=</span> <span class="n">col_data</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">partial_data_1</span><span class="p">,</span> <span class="n">partial_data_2</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Independence variable </span><span class="si">{}</span><span class="s2"> Point to point&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">columnName</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">dir_path</span><span class="p">:</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">dir_path</span> <span class="o">+</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">IndipP2P_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">columnName</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">return_figs</span><span class="p">:</span>
+                <span class="n">figs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+            
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Done!&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">return_figs</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">figs</span></div>
+
+<div class="viewcode-block" id="Sanity_Check.plot_density_hist"><a class="viewcode-back" href="../../utilities.html#utilities.sanity_check.Sanity_Check.plot_density_hist">[docs]</a>    <span class="k">def</span> <span class="nf">plot_density_hist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">features</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dir_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">return_figs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span> <span class="c1">#2) Histogram of density</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param features: pandas Dataframe</span>
+<span class="sd">        :param dir_path: (optional) directory path where to save files</span>
+<span class="sd">        :param verbose: disable if you don&#39;t want verbose output</span>
+<span class="sd">        :param return_figs: if set to true will return all the figs. It can consume a lot of memory</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span> <span class="c1"># if value of features is a str will be evaluated as a path</span>
+            <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">features</span><span class="p">):</span> <span class="c1"># check if file exists</span>
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reading features from </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">features</span><span class="p">))</span>
+                <span class="n">features</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+                <span class="n">features</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">features</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># delete Y vector    </span>
+                <span class="n">features</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">features</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="c1"># resetting indexes</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;features csv file doesn&#39;t exist&quot;</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+
+        <span class="n">figs</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># if features.dtypes[0] == &#39;float32&#39; or features.dtypes[0] == &#39;float16&#39;:</span>
+        <span class="c1">#     raise ValueError(&quot;Features DataFrame has dtype = {}. Dtype must be at least &#39;float64&#39;. If you optimized dataset generation, please turn it to &#39;false&#39;&quot;.format(features.dtypes[0]))</span>
+        <span class="k">if</span> <span class="n">dir_path</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dir_path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Parameter &#39;dir_path&#39; is not valid&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Plotting density histogram...&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">columnName</span><span class="p">,</span> <span class="n">columnData</span><span class="p">)</span> <span class="ow">in</span> <span class="n">features</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">return_figs</span><span class="p">:</span>
+                <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+            <span class="n">col_data</span> <span class="o">=</span> <span class="n">columnData</span><span class="o">.</span><span class="n">values</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">col_data</span><span class="p">,</span><span class="n">bins</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span> <span class="c1"># different exception with bins=&#39;auto&#39;, optimize=True and opt_level=1/2</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Distribution variable </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">columnName</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">dir_path</span><span class="p">:</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">dir_path</span> <span class="o">+</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">Distrib_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">columnName</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">return_figs</span><span class="p">:</span>
+                <span class="n">figs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Done!&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">return_figs</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">figs</span></div>
+
+<div class="viewcode-block" id="Sanity_Check.plot_autocorr_function"><a class="viewcode-back" href="../../utilities.html#utilities.sanity_check.Sanity_Check.plot_autocorr_function">[docs]</a>    <span class="k">def</span> <span class="nf">plot_autocorr_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">features</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dir_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">return_figs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span> <span class="c1">#3) Autocorrelation function</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span> <span class="c1"># if value of features is a str will be evaluated as a path</span>
+            <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">features</span><span class="p">):</span> <span class="c1"># check if file exists</span>
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reading features from </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">features</span><span class="p">))</span>
+                <span class="n">features</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+                <span class="n">features</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">features</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># delete Y vector    </span>
+                <span class="n">features</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">features</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="c1"># resetting indexes</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;features csv file doesn&#39;t exist&quot;</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param features: pandas Dataframe</span>
+<span class="sd">        :param dir_path: (optional) directory path where to save files</span>
+<span class="sd">        :param return_figs: if set to true will return all the figs. It can consume a lot of memory</span>
+<span class="sd">        :param verbose: disable if you don&#39;t want verbose output</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">dir_path</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dir_path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Parameter &#39;dir_path&#39; is not valid&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Plotting autocorrelation function...&quot;</span><span class="p">)</span>
+
+        <span class="n">figs</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">columnName</span><span class="p">,</span> <span class="n">columnData</span><span class="p">)</span> <span class="ow">in</span> <span class="n">features</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">return_figs</span><span class="p">:</span>
+                <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+            <span class="c1">#(check if each value is correlated to the 20 values ahead)</span>
+            <span class="n">col_data</span> <span class="o">=</span> <span class="n">columnData</span><span class="o">.</span><span class="n">values</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">col_data</span><span class="p">)</span>
+            <span class="n">sm</span><span class="o">.</span><span class="n">graphics</span><span class="o">.</span><span class="n">tsa</span><span class="o">.</span><span class="n">plot_acf</span><span class="p">(</span><span class="n">col_data</span><span class="p">,</span><span class="n">lags</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Autocorrelation variable </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">columnName</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">dir_path</span><span class="p">:</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">dir_path</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">Autocorr_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">columnName</span><span class="p">))</span> 
+            <span class="k">if</span> <span class="n">return_figs</span><span class="p">:</span>
+                <span class="n">figs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Done!&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">return_figs</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">figs</span></div>
+
+
+<div class="viewcode-block" id="Sanity_Check.plot_p2p_indip"><a class="viewcode-back" href="../../utilities.html#utilities.sanity_check.Sanity_Check.plot_p2p_indip">[docs]</a>    <span class="k">def</span> <span class="nf">plot_p2p_indip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">features</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dir_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">return_figs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span> <span class="c1">#4) Independence between variables 2-2</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span> <span class="c1"># if value of features is a str will be evaluated as a path</span>
+            <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">features</span><span class="p">):</span> <span class="c1"># check if file exists</span>
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reading features from </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">features</span><span class="p">))</span>
+                <span class="n">features</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+                <span class="n">features</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">features</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># delete Y vector    </span>
+                <span class="n">features</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">features</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="c1"># resetting indexes</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;features csv file doesn&#39;t exist&quot;</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param features: pandas Dataframe</span>
+<span class="sd">        :param dir_path: (optional) directory path where to save files</span>
+<span class="sd">        :param return_figs: if set to true will return all the figs. It can consume a lot of memory</span>
+<span class="sd">        :param verbose: disable if you don&#39;t want verbose output</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">figs</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">dir_path</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dir_path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Parameter &#39;dir_path&#39; is not valid&quot;</span><span class="p">)</span>
+
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Plotting point to point indipendency...&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="p">(</span><span class="n">columnName</span><span class="p">,</span> <span class="n">columnData</span><span class="p">)</span> <span class="ow">in</span> <span class="n">features</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="k">for</span> <span class="p">(</span><span class="n">columnName2</span><span class="p">,</span> <span class="n">columnData2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">features</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">return_figs</span><span class="p">:</span>
+                    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+                <span class="n">col_data</span> <span class="o">=</span> <span class="n">columnData</span><span class="o">.</span><span class="n">values</span>
+                <span class="k">if</span> <span class="n">columnName</span> <span class="o">!=</span> <span class="n">columnName2</span><span class="p">:</span>
+                    <span class="n">col_data2</span> <span class="o">=</span> <span class="n">columnData2</span><span class="o">.</span><span class="n">values</span>
+                    <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">col_data</span><span class="p">,</span><span class="n">col_data2</span><span class="p">)</span>
+                    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Independence of Variables </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">columnName</span><span class="p">,</span> <span class="n">columnName2</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="n">dir_path</span><span class="p">:</span>
+                        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">dir_path</span> <span class="o">+</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">Indip_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">columnName</span><span class="p">,</span> <span class="n">columnName2</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="n">return_figs</span><span class="p">:</span>
+                        <span class="n">figs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Done!&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">return_figs</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">figs</span></div>
+
+
+<div class="viewcode-block" id="Sanity_Check.plot_spearman_correlation"><a class="viewcode-back" href="../../utilities.html#utilities.sanity_check.Sanity_Check.plot_spearman_correlation">[docs]</a>    <span class="k">def</span> <span class="nf">plot_spearman_correlation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">features</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dir_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">return_figs</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span> <span class="c1"># if value of features is a str will be evaluated as a path</span>
+            <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">features</span><span class="p">):</span> <span class="c1"># check if file exists</span>
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reading features from </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">features</span><span class="p">))</span>
+                <span class="n">features</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+                <span class="n">features</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">features</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># delete Y vector    </span>
+                <span class="n">features</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">features</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="c1"># resetting indexes</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;features csv file doesn&#39;t exist&quot;</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param features: pandas Dataframe</span>
+<span class="sd">        :param dir_path: (optional) directory path where to save files</span>
+<span class="sd">        :param return_figs: if set to true will return all the figs. It can consume a lot of memory</span>
+<span class="sd">        :param verbose: disable if you don&#39;t want verbose output</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">dir_path</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dir_path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Parameter &#39;dir_path&#39; is not valid&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Plotting spearman correlation...&quot;</span><span class="p">)</span>
+
+        <span class="n">corr</span> <span class="o">=</span> <span class="n">features</span><span class="o">.</span><span class="n">corr</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;spearman&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">return_figs</span><span class="p">:</span>
+            <span class="n">fig</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">corr</span><span class="p">,</span> <span class="n">xticklabels</span><span class="o">=</span><span class="n">corr</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">yticklabels</span><span class="o">=</span><span class="n">corr</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Matrix of Spearman Correlation&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dir_path</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">dir_path</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">Correlation&quot;</span><span class="p">)</span>
+        
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Done!&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">return_figs</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">fig</span></div>
+
+
+<div class="viewcode-block" id="Sanity_Check.plot_all"><a class="viewcode-back" href="../../utilities.html#utilities.sanity_check.Sanity_Check.plot_all">[docs]</a>    <span class="k">def</span> <span class="nf">plot_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">features</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dir_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">multi_proc</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span> <span class="c1"># plot all</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span> <span class="c1"># if value of features is a str will be evaluated as a path</span>
+            <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">features</span><span class="p">):</span> <span class="c1"># check if file exists</span>
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reading features from </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">features</span><span class="p">))</span>
+                <span class="n">features</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">features</span><span class="p">)</span> <span class="c1"># read csv file</span>
+                <span class="n">features</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">features</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># delete Y vector    </span>
+                <span class="n">features</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">features</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="c1"># resetting indexes</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;features csv file doesn&#39;t exist&quot;</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param features: pandas Dataframe</span>
+<span class="sd">        :param dir_path: (optional) directory path where to save files</span>
+<span class="sd">        :param verbose: disable if you don&#39;t want verbose output</span>
+<span class="sd">        :param return_figs: if set to true will return all the figs. It can consume a lot of memory</span>
+<span class="sd">        :param multi_proc: set true for multiprocessing mode (experimental)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">start_ts</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">multi_proc</span><span class="p">:</span>
+            <span class="n">fa_multi_proc</span> <span class="o">=</span> <span class="n">Feature_Analyzer_MultiProc_Executor</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">dir_path</span><span class="p">,</span> <span class="n">verbose</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+            <span class="n">fa_multi_proc</span><span class="o">.</span><span class="n">run_processes</span><span class="p">()</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">plot_value_indip</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">dir_path</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">plot_density_hist</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">dir_path</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">plot_autocorr_function</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">dir_path</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">plot_p2p_indip</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">dir_path</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">plot_spearman_correlation</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">dir_path</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+
+        <span class="n">end_ts</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Analysis time: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">end_ts</span> <span class="o">-</span> <span class="n">start_ts</span><span class="p">))</span>
+            
+        <span class="k">return</span></div></div>
+
+
+<div class="viewcode-block" id="Feature_Analyzer_MultiProc_Executor"><a class="viewcode-back" href="../../utilities.html#utilities.sanity_check.Feature_Analyzer_MultiProc_Executor">[docs]</a><span class="k">class</span> <span class="nc">Feature_Analyzer_MultiProc_Executor</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class that runs analysis in multiprocessing</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Il multiprocessing è processi in parallelo, multithreading è thread in parallelo in concorrenza tra loro</span>
+    <span class="c1"># (perché condividono memoria) nello stesso processo. Dai test i thread risultano incompatibili con la</span>
+    <span class="c1"># libreria matplotlib che non è thread safe quindi ho optato per multiprocessing. Il multiprocessing</span>
+    <span class="c1"># ha un costo di creazione maggiore ma è molto più veloce rispetto al multithreading (proprio perché)</span>
+    <span class="c1"># ci sono processi completamente separati che sfruttano CPU diverse.</span>
+
+    <span class="c1"># DA RICORDARE: La ragione per cui nei test il multithreading è leggermente più lento potrebbe essere </span>
+    <span class="c1"># perché le CPU sul mio pc sono 4 e mettere più di 4 processi causerebbe la concorrenza negli stessi processi</span>
+    <span class="c1"># nel prendere le CPU oppure semplicemente il costo di creazione di ogni processo è abbastanza alto, </span>
+    <span class="c1"># quindi sarebbe consigliato fare multiprocessing per eseguire in parallelo molte più funzioni</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">features</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dir_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fa</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param features: pandas Dataframe, it represents the features that will be analyzed</span>
+<span class="sd">        :param dir_path: str, path where analysis will be saved</span>
+<span class="sd">        :param verbose: bool, set true if you want verbose output</span>
+<span class="sd">        :param fa: object of class Feature_Analyzer</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">features</span> <span class="o">=</span> <span class="n">features</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dir_path</span> <span class="o">=</span> <span class="n">dir_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">fa</span> <span class="o">=</span> <span class="n">fa</span>
+
+<div class="viewcode-block" id="Feature_Analyzer_MultiProc_Executor.run_processes"><a class="viewcode-back" href="../../utilities.html#utilities.sanity_check.Feature_Analyzer_MultiProc_Executor.run_processes">[docs]</a>    <span class="k">def</span> <span class="nf">run_processes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; This method runs parallel processes &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running 5 processes ...&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of CPUs: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">multiprocessing</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">()))</span>
+        <span class="n">procs</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">procs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fa</span><span class="o">.</span><span class="n">plot_value_indip</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)))</span>
+        <span class="n">procs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fa</span><span class="o">.</span><span class="n">plot_density_hist</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)))</span>
+        <span class="n">procs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fa</span><span class="o">.</span><span class="n">plot_autocorr_function</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)))</span>
+        <span class="n">procs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fa</span><span class="o">.</span><span class="n">plot_p2p_indip</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)))</span>
+        <span class="n">procs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Process</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fa</span><span class="o">.</span><span class="n">plot_spearman_correlation</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dir_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)))</span>
+
+        <span class="p">[</span><span class="n">proc</span><span class="o">.</span><span class="n">start</span><span class="p">()</span> <span class="k">for</span> <span class="n">proc</span> <span class="ow">in</span> <span class="n">procs</span><span class="p">]</span>
+        <span class="p">[</span><span class="n">proc</span><span class="o">.</span><span class="n">join</span><span class="p">()</span> <span class="k">for</span> <span class="n">proc</span> <span class="ow">in</span> <span class="n">procs</span><span class="p">]</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">DatasetGenerator</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Jacopo Maccaferri, Giorgio Visani, Carlo Cannarsa.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,318 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>implementation_lr.lr_generator &#8212; DatasetGenerator 1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for implementation_lr.lr_generator</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">path</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">implementation_lr.lr_params</span> <span class="kn">import</span> <span class="n">LR_Params</span>
+<span class="kn">from</span> <span class="nn">implementation_lr.lr_results</span> <span class="kn">import</span> <span class="n">LR_Results</span>
+<span class="kn">from</span> <span class="nn">utilities.gen_details</span> <span class="kn">import</span> <span class="n">Generation_Details</span>
+<span class="kn">from</span> <span class="nn">utilities.correlation_matrix_generator</span> <span class="kn">import</span> <span class="n">Correlation_Matrix_Generator</span>
+<span class="kn">from</span> <span class="nn">utilities.byte_formatter</span> <span class="kn">import</span> <span class="n">ByteFormatter</span>
+<span class="kn">from</span> <span class="nn">abstract_classes.dgp_generator</span> <span class="kn">import</span> <span class="n">DGP_Generator</span><span class="p">,</span> <span class="n">DGP_Chunk_Generator</span>
+<span class="kn">from</span> <span class="nn">abstract_classes.dgp_results</span> <span class="kn">import</span> <span class="n">DGP_Results</span>
+<span class="kn">from</span> <span class="nn">abstract_classes.dgp_results_saver</span> <span class="kn">import</span> <span class="n">DGP_Results_Saver</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+
+<div class="viewcode-block" id="LR_Generator"><a class="viewcode-back" href="../../implementation_lr.html#implementation_lr.lr_generator.LR_Generator">[docs]</a><span class="k">class</span> <span class="nc">LR_Generator</span><span class="p">(</span><span class="n">DGP_Generator</span><span class="p">):</span> <span class="c1"># Linear Regression Generator</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Implementation of DGP_Generator, used for Linear Regression.</span>
+<span class="sd">    Its functions generate dataset with optimization level, for memory saving</span>
+<span class="sd">    see dgpy.lr_generator.LR_Chunk_Generator for dataset generation chunk by chunk</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+<div class="viewcode-block" id="LR_Generator.generate_dataset"><a class="viewcode-back" href="../../implementation_lr.html#implementation_lr.lr_generator.LR_Generator.generate_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">generate_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">opt_level</span><span class="o">=</span><span class="s1">&#39;float64&#39;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+        <span class="c1"># LR GENERATING PROCESS</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param params: instance of LR_Params</span>
+<span class="sd">        :param verbose: verbose output</span>
+<span class="sd">        :param opt_level: str that represent the float type for casting arrays. Can be &#39;float64&#39;, &#39;float32&#39; or &#39;float16&#39;. Default &#39;float64&#39;\n</span>
+<span class="sd">                &#39;float64&#39; -&gt; default (no optimization)\n</span>
+<span class="sd">                &#39;float32&#39; -&gt; downcast to float32\n</span>
+<span class="sd">                &#39;float16&#39; -&gt; downcast to float16\n</span>
+
+<span class="sd">        :return: instance of class DGP_Results</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="k">if</span> <span class="n">opt_level</span> <span class="o">!=</span> <span class="s1">&#39;float32&#39;</span> <span class="ow">and</span> <span class="n">opt_level</span> <span class="o">!=</span> <span class="s1">&#39;float16&#39;</span> <span class="ow">and</span> <span class="n">opt_level</span> <span class="o">!=</span> <span class="s1">&#39;float64&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Parameter &#39;opt_level&#39; is not valid&quot;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">start_ts</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">opt_level</span> <span class="o">==</span> <span class="s1">&#39;float32&#39;</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Generating dataset with optimization level: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">opt_level</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="n">opt_level</span> <span class="o">==</span> <span class="s1">&#39;float16&#39;</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Generating dataset with optimization level: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">opt_level</span><span class="p">))</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Warning: possible loss of arithmetic result precision&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Start time: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">start_ts</span><span class="p">))</span>
+
+
+        <span class="c1"># Ad ogni generazione reinizializzo la randomizzazione</span>
+        <span class="c1"># Questo perché se invoco la stessa funzione ad esempio 2 volte nel codice cliente</span>
+        <span class="c1"># i risultati verrebbero sballati nella seconda in quando viene modificato il random state</span>
+        <span class="n">params</span><span class="o">.</span><span class="n">initialize_randomization</span><span class="p">()</span>
+
+        <span class="n">stdevs</span> <span class="o">=</span> <span class="n">Correlation_Matrix_Generator</span><span class="o">.</span><span class="n">gen_standard_devs</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">seed</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">n_variables</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">related_vars</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">n_scales</span><span class="p">,</span> <span class="n">opt_level</span><span class="o">=</span><span class="n">opt_level</span><span class="p">)</span>
+        <span class="n">correlation_matrix_x</span> <span class="o">=</span> <span class="n">Correlation_Matrix_Generator</span><span class="o">.</span><span class="n">gen_corr_matrix</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">seed</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">n_variables</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">related_vars</span><span class="p">,</span> <span class="n">opt_level</span><span class="o">=</span><span class="n">opt_level</span><span class="p">)</span>
+
+        <span class="c1"># Creo la Covariance Matrix a partire dalla correlation matrix e dalle stdevs</span>
+        <span class="n">covariance_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">stdevs</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">stdevs</span><span class="p">)</span> <span class="o">*</span> <span class="n">correlation_matrix_x</span>
+
+        <span class="n">x_state</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
+        <span class="n">x_state</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">get_state</span><span class="p">())</span>
+        <span class="c1"># se mi salvo lo stato (ad esempio x_state) devo essere nello stato giusto per poter generare gli stessi numeri.</span>
+        <span class="c1"># Inserendo np.random.RandomState(params.seed) resetto il generatore, non voglio questo.</span>
+
+        <span class="n">y_state</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
+        <span class="n">y_state</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">get_state</span><span class="p">())</span>
+
+        <span class="c1"># Genero dati da Normale Multivariata (X rv)</span>
+        <span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">x_state</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">means</span><span class="p">,</span> <span class="n">cov</span><span class="o">=</span><span class="n">covariance_matrix</span><span class="p">,</span>\
+                                                         <span class="n">size</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">n_points</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">opt_level</span><span class="p">))</span>
+        <span class="n">mean_y</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">betas</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">betas</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+        <span class="n">stdev_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">error_variance</span><span class="p">)</span>
+
+
+        <span class="n">Y</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">y_state</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">mean_y</span><span class="p">,</span> <span class="n">stdev_y</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">opt_level</span><span class="p">))</span>
+
+        <span class="n">end_ts</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;End time: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">end_ts</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Generating process time: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">end_ts</span> <span class="o">-</span> <span class="n">start_ts</span><span class="p">))</span>
+            <span class="n">x_usage</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">memory_usage</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+            <span class="n">y_usage</span> <span class="o">=</span> <span class="n">Y</span><span class="o">.</span><span class="n">memory_usage</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Total memory usage of [Y, X]: </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ByteFormatter</span><span class="o">.</span><span class="n">format_bytes</span><span class="p">(</span><span class="n">x_usage</span> <span class="o">+</span> <span class="n">y_usage</span><span class="p">)))</span>
+
+
+        <span class="n">gen_details</span> <span class="o">=</span> <span class="n">Generation_Details</span><span class="p">(</span><span class="n">start_ts</span><span class="p">,</span> <span class="n">end_ts</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">LR_Results</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">covariance_matrix</span><span class="p">,</span> <span class="n">correlation_matrix_x</span><span class="p">,</span> <span class="n">gen_details</span><span class="p">)</span>
+
+        <span class="c1"># dovrei tornare indietro con lo stato perché altrimenti nel codice cliente</span>
+        <span class="c1"># se invoco i due generatori uno dopo l&#39;altro non producono gli stessi dati</span>
+
+        <span class="k">return</span> <span class="n">result</span></div></div>
+
+
+
+
+
+<div class="viewcode-block" id="LR_Chunk_Generator"><a class="viewcode-back" href="../../implementation_lr.html#implementation_lr.lr_generator.LR_Chunk_Generator">[docs]</a><span class="k">class</span> <span class="nc">LR_Chunk_Generator</span><span class="p">(</span><span class="n">DGP_Chunk_Generator</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Implementation of DGP_Generator, used for Linear Regression.</span>
+<span class="sd">    Its functions generate dataset chunk by chunk with optimization level, for memory saving</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="LR_Chunk_Generator.generate_dataset"><a class="viewcode-back" href="../../implementation_lr.html#implementation_lr.lr_generator.LR_Chunk_Generator.generate_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">generate_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">saver</span><span class="p">,</span> <span class="n">chunks</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">opt_level</span><span class="o">=</span><span class="s1">&#39;float64&#39;</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">compr_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param params: instance of LR_Params</span>
+<span class="sd">        :param chunks: int, number of chunks that the dataset will have. It represents the number of total iterations</span>
+<span class="sd">        :param verbose: verbose output</span>
+<span class="sd">        :param opt_level: str that represent the float type for casting arrays. Can be &#39;float64&#39;, &#39;float32&#39; or &#39;float16&#39;. Default &#39;float64&#39;\n</span>
+<span class="sd">        &#39;float64&#39; -&gt; default (no optimization)\n</span>
+<span class="sd">        &#39;float32&#39; -&gt; downcast to float32\n</span>
+<span class="sd">        &#39;float16&#39; -&gt; downcast to float16\n</span>
+<span class="sd">        :param compression: bool. Set true if you want compression (must not have compr_type = None)</span>
+<span class="sd">        :param compr_type: str that represent the compression type. Works only if compression is set to True. Can be 3 values:\n\t</span>
+<span class="sd">        &#39;gz&#39; -&gt; using gunzip compression, file will be saved as &lt;filename&gt;.csv.gz\n\t</span>
+<span class="sd">        &#39;bz&#39; -&gt; using bzip compression, file will be saved as &lt;filename&gt;.csv.bz\n\t</span>
+<span class="sd">        &#39;xz&#39; -&gt; using xz compression, file will be saved as &lt;filename&gt;.csv.xz\n\t</span>
+
+<span class="sd">        You may not assign this method to a variable, because it doesn&#39;t mantain anything in memory</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Ad ogni generazione reinizializzo la randomizzazione</span>
+        <span class="c1"># Questo perché se invoco la stessa funzione ad esempio 2 volte nel codice cliente</span>
+        <span class="c1"># i risultati verrebbero sballati nella seconda in quando viene modificato il random state</span>
+        <span class="n">params</span><span class="o">.</span><span class="n">initialize_randomization</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">compression</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">compr_type</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;bz&#39;</span><span class="p">,</span> <span class="s1">&#39;gz&#39;</span><span class="p">,</span> <span class="s1">&#39;xz&#39;</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Parameter &#39;compr_type&#39; is not valid&quot;</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">params</span><span class="o">.</span><span class="n">n_points</span> <span class="o">%</span> <span class="n">chunks</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Parameter &#39;chunks&#39; is not valid. param &#39;n_points&#39; must be divisible by param &#39;chunks&#39;&quot;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">chunks</span> <span class="o">&gt;</span> <span class="n">params</span><span class="o">.</span><span class="n">n_points</span> <span class="ow">or</span> <span class="n">chunks</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Parameter &#39;chunks&#39; is not valid&quot;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">compression</span><span class="p">:</span>
+            <span class="n">dataset_filename</span> <span class="o">=</span> <span class="s2">&quot;dataset.csv&quot;</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">compr_type</span>
+            <span class="n">corr_matr_filename</span> <span class="o">=</span> <span class="s2">&quot;corr_matrix.csv&quot;</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">compr_type</span>
+            <span class="n">cov_matr_filename</span> <span class="o">=</span> <span class="s2">&quot;cov_matrix.csv&quot;</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">compr_type</span>
+            <span class="n">betas_filename</span> <span class="o">=</span> <span class="s2">&quot;betas.csv&quot;</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">compr_type</span>
+            <span class="n">gen_det_filename</span> <span class="o">=</span> <span class="s2">&quot;gen_details.csv&quot;</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">compr_type</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dataset_filename</span> <span class="o">=</span> <span class="s2">&quot;dataset.csv&quot;</span>
+            <span class="n">corr_matr_filename</span> <span class="o">=</span> <span class="s2">&quot;corr_matrix.csv&quot;</span>
+            <span class="n">cov_matr_filename</span> <span class="o">=</span> <span class="s2">&quot;cov_matrix.csv&quot;</span>
+            <span class="n">betas_filename</span> <span class="o">=</span> <span class="s2">&quot;betas.csv&quot;</span>
+            <span class="n">gen_det_filename</span> <span class="o">=</span> <span class="s2">&quot;gen_details.csv&quot;</span>
+
+
+        <span class="n">stdevs</span> <span class="o">=</span> <span class="n">Correlation_Matrix_Generator</span><span class="o">.</span><span class="n">gen_standard_devs</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">seed</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">n_variables</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">related_vars</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">n_scales</span><span class="p">,</span> <span class="n">opt_level</span><span class="o">=</span><span class="n">opt_level</span><span class="p">)</span>
+        <span class="n">correlation_matrix_x</span> <span class="o">=</span> <span class="n">Correlation_Matrix_Generator</span><span class="o">.</span><span class="n">gen_corr_matrix</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">seed</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">n_variables</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">related_vars</span><span class="p">,</span> <span class="n">opt_level</span><span class="o">=</span><span class="n">opt_level</span><span class="p">)</span>
+        <span class="n">covariance_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">stdevs</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">stdevs</span><span class="p">)</span> <span class="o">*</span> <span class="n">correlation_matrix_x</span>
+
+        <span class="n">saver</span><span class="o">.</span><span class="n">save_dataframe</span><span class="p">(</span><span class="n">correlation_matrix_x</span><span class="p">,</span> <span class="n">corr_matr_filename</span><span class="p">)</span>
+        <span class="n">saver</span><span class="o">.</span><span class="n">save_dataframe</span><span class="p">(</span><span class="n">covariance_matrix</span><span class="p">,</span> <span class="n">cov_matr_filename</span><span class="p">)</span>
+        <span class="n">saver</span><span class="o">.</span><span class="n">save_dataframe</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">betas</span><span class="p">,</span> <span class="n">betas_filename</span><span class="p">)</span>
+
+
+        <span class="n">chunksize</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">n_points</span> <span class="o">/</span> <span class="n">chunks</span><span class="p">)</span>
+        <span class="n">rest</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">n_points</span> <span class="o">%</span> <span class="n">chunks</span>
+        <span class="n">stdev_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">error_variance</span><span class="p">)</span>
+        <span class="n">start_ts</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="c1"># start counter</span>
+
+        <span class="c1"># se mi salvo lo stato (ad esempio x_state) devo essere nello stato giusto per poter generare gli stessi numeri.</span>
+        <span class="c1"># Inserendo np.random.RandomState(params.seed) resetto il generatore, ciò non basta. Devo anche settare lo stato</span>
+                
+        <span class="n">x_state</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
+        <span class="n">x_state</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">get_state</span><span class="p">())</span>
+
+        <span class="n">y_state</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
+        <span class="n">y_state</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">get_state</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">chunks</span><span class="p">):</span>
+
+
+            <span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">x_state</span><span class="o">.</span><span class="n">multivariate_normal</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="n">params</span><span class="o">.</span><span class="n">means</span><span class="p">,</span> <span class="n">cov</span><span class="o">=</span><span class="n">covariance_matrix</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">chunksize</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">opt_level</span><span class="p">))</span>
+            <span class="n">mean_y</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">betas</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">params</span><span class="o">.</span><span class="n">betas</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">opt_level</span><span class="p">)</span>
+            <span class="n">Y</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">y_state</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">mean_y</span><span class="p">,</span> <span class="n">stdev_y</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">opt_level</span><span class="p">))</span>
+            <span class="c1"># concat dataframes to form a matrix [Y, X]</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">Y</span><span class="p">,</span> <span class="n">X</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">dataset</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="c1"># resetting indexes</span>
+            
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">saver</span><span class="o">.</span><span class="n">save_dataframe</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">dataset_filename</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">saver</span><span class="o">.</span><span class="n">save_dataframe</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">dataset_filename</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        
+
+        <span class="n">end_ts</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="c1"># stop counter</span>
+
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="c1"># print(&quot;Number of iterations: {} + {}&quot;.format(chunks, rest))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of iterations: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chunks</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Memory usage of [Y, X] (per chunk): </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ByteFormatter</span><span class="o">.</span><span class="n">format_bytes</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">memory_usage</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">())))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Dataset generation time took </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">end_ts</span> <span class="o">-</span> <span class="n">start_ts</span><span class="p">))</span>
+
+        <span class="n">gen_details</span> <span class="o">=</span> <span class="n">Generation_Details</span><span class="p">(</span><span class="n">start_ts</span><span class="p">,</span> <span class="n">end_ts</span><span class="p">)</span>
+        <span class="n">gen_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">gen_dict</span><span class="p">[</span><span class="s1">&#39;Start time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gen_details</span><span class="o">.</span><span class="n">start_ts</span>
+        <span class="n">gen_dict</span><span class="p">[</span><span class="s1">&#39;End time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gen_details</span><span class="o">.</span><span class="n">end_ts</span>
+        <span class="n">gen_dict</span><span class="p">[</span><span class="s1">&#39;Elapsed time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gen_details</span><span class="o">.</span><span class="n">end_ts</span> <span class="o">-</span> <span class="n">gen_details</span><span class="o">.</span><span class="n">start_ts</span>
+        <span class="n">gen_dict</span><span class="p">[</span><span class="s1">&#39;OS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gen_details</span><span class="o">.</span><span class="n">platform_name</span>
+        <span class="n">gen_dict</span><span class="p">[</span><span class="s1">&#39;User&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gen_details</span><span class="o">.</span><span class="n">user</span>
+        <span class="n">gen_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">gen_dict</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+        <span class="n">saver</span><span class="o">.</span><span class="n">save_dataframe</span><span class="p">(</span><span class="n">gen_df</span><span class="p">,</span> <span class="n">gen_det_filename</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;:&quot;</span><span class="p">)</span></div></div>
+
+        <span class="c1"># dovrei tornare indietro con lo stato perché altrimenti nel codice cliente</span>
+        <span class="c1"># se invoco i due generatori uno dopo l&#39;altro non producono gli stessi dati</span>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">DatasetGenerator</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Jacopo Maccaferri, Giorgio Visani, Carlo Cannarsa.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

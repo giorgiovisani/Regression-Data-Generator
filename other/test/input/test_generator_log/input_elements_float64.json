@@ -1,0 +1,15 @@
+{
+"type_of_regression": "log",
+"out_name": "test_generator_log",
+"opt_level": "float64",
+"verbose": "False",
+"csv_files": "True",
+"seed": 11,
+"n_variables": 5,
+"error_variance": 0,
+"n_points": 12,
+"related_vars": 3,
+"n_scales": 1,
+"requested_odds": 2,
+"unuseful_vars": 1
+}

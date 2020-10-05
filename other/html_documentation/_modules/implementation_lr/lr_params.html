@@ -1,0 +1,217 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>implementation_lr.lr_params &#8212; DatasetGenerator 1.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <h1>Source code for implementation_lr.lr_params</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">abstract_classes.dgp_params</span> <span class="kn">import</span> <span class="n">DGP_Params</span>
+
+<div class="viewcode-block" id="LR_Params"><a class="viewcode-back" href="../../implementation_lr.html#implementation_lr.lr_params.LR_Params">[docs]</a><span class="k">class</span> <span class="nc">LR_Params</span><span class="p">(</span><span class="n">DGP_Params</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot; Inplementation of DGP_Params, used for Linear Regression Data Generating Process &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_variables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">error_variance</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> \
+        <span class="n">n_points</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">related_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_scales</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">requested_mean</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">unuseful_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">betas</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param seed: int, the seed for initialize random generation. If not set, will be randomized</span>
+<span class="sd">        :param n_variables: int, number of variables</span>
+<span class="sd">        :param error_variance: int, error variance of error vector</span>
+<span class="sd">        :param n_points: int, it represents the number of points that will be generated</span>
+<span class="sd">        :param related_vars: int, number of related variables</span>
+<span class="sd">        :param n_scales: int, number of scales</span>
+<span class="sd">        :param requested_mean: int, mean of vector Y</span>
+<span class="sd">        :param unuseful_vars: int, number of 0 betas</span>
+<span class="sd">        :param betas: array. If not set, it will be randomized considering unuseful_vars</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+       
+        <span class="bp">self</span><span class="o">.</span><span class="n">validate_params_and_create_obj</span><span class="p">(</span><span class="n">seed</span><span class="p">,</span> <span class="n">n_variables</span><span class="p">,</span> <span class="n">error_variance</span><span class="p">,</span> \
+            <span class="n">n_points</span><span class="p">,</span> <span class="n">related_vars</span><span class="p">,</span> <span class="n">n_scales</span><span class="p">,</span> <span class="n">requested_mean</span><span class="p">,</span> <span class="n">unuseful_vars</span><span class="p">,</span> <span class="n">betas</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="LR_Params.validate_params_and_create_obj"><a class="viewcode-back" href="../../implementation_lr.html#implementation_lr.lr_params.LR_Params.validate_params_and_create_obj">[docs]</a>    <span class="k">def</span> <span class="nf">validate_params_and_create_obj</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_variables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">error_variance</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_points</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> \
+        <span class="n">related_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">n_scales</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">requested_mean</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">unuseful_vars</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">betas</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gen_x_means</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="c1"># seed is randomized</span>
+            <span class="c1"># se il seed viene generato non e&#39; possibile ricavarselo</span>
+            <span class="c1"># è possibile invece riprendersi lo stato del seed:</span>
+            <span class="c1"># https://stackoverflow.com/questions/32172054/how-can-i-retrieve-the-current-seed-of-numpys-random-number-generator</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">seed</span> <span class="o">=</span> <span class="n">seed</span>
+
+        <span class="c1"># Set the seed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">initialize_randomization</span><span class="p">()</span>
+        
+        <span class="n">random_copy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span> <span class="c1"># mi faccio una copia, non voglio mai alterare lo stato globale</span>
+
+        <span class="k">if</span> <span class="n">n_variables</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">n_variables</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Parameter &#39;n_variables&#39; is not valid&quot;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_variables</span> <span class="o">=</span> <span class="n">n_variables</span>
+
+        <span class="k">if</span> <span class="n">error_variance</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> 
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Parameter &#39;error_variance&#39; is not valid&quot;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error_variance</span> <span class="o">=</span> <span class="n">error_variance</span>   
+
+        <span class="k">if</span> <span class="n">n_points</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">n_points</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span> 
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Parameter &#39;n_points&#39; is not valid&quot;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_points</span> <span class="o">=</span> <span class="n">n_points</span>
+
+        <span class="k">if</span> <span class="n">related_vars</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">related_vars</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span> 
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Parameter &#39;related_vars&#39; is not valid&quot;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">related_vars</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_variables</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Parameter &#39;related_vars&#39; must be &lt; than &#39;n_variables&#39;&quot;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">related_vars</span> <span class="o">=</span> <span class="n">related_vars</span>      
+
+        <span class="k">if</span> <span class="n">n_scales</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">n_scales</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Parameter &#39;n_scales&#39; is not valid&quot;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_scales</span> <span class="o">=</span> <span class="n">n_scales</span>
+
+        <span class="c1"># requested_mean represents the X mean</span>
+        <span class="k">if</span> <span class="n">requested_mean</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> 
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Parameter &#39;requested_mean&#39; is not valid&quot;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">requested_mean</span> <span class="o">=</span> <span class="n">requested_mean</span>     
+
+        <span class="c1"># gen X means if true</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">means</span> <span class="o">=</span> <span class="p">[</span><span class="nb">round</span><span class="p">(</span><span class="n">random_copy</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_variables</span><span class="p">)]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">means</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">means</span><span class="p">,</span> <span class="p">[[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">][</span><span class="n">random_copy</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">means</span><span class="p">))]))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">unuseful_vars</span> <span class="o">=</span> <span class="n">unuseful_vars</span>
+        
+        <span class="k">if</span> <span class="n">betas</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">:</span> <span class="c1"># is randomized</span>
+            <span class="k">if</span> <span class="n">unuseful_vars</span> <span class="ow">is</span> <span class="kc">None</span> <span class="p">:</span> 
+                <span class="bp">self</span><span class="o">.</span><span class="n">unuseful_vars</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">elif</span> <span class="n">unuseful_vars</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span> 
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Parameter &#39;unuseful_vars&#39; is not valid&quot;</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">unuseful_vars</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_variables</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Parameter &#39;unuseful_vars&#39; must be &lt; than &#39;n_variables&#39;&quot;</span><span class="p">)</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            
+            <span class="c1"># Generate vector of coefficients (random[0,3]), randomly switch some to negative</span>
+            <span class="n">betas</span> <span class="o">=</span> <span class="p">[</span><span class="nb">round</span><span class="p">(</span><span class="n">random_copy</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_variables</span> <span class="o">-</span> <span class="n">unuseful_vars</span><span class="p">)]</span>
+            <span class="n">betas</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">betas</span><span class="p">,</span> <span class="p">[[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">][</span><span class="n">random_copy</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">2</span><span class="p">)]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">betas</span><span class="p">))]))</span>
+            
+            <span class="c1"># Add such zeros as the unuseful variables in random positions of the beta vector</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">unuseful_vars</span><span class="p">):</span>
+                <span class="n">index</span> <span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">betas</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">betas</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+
+            <span class="c1"># Voglio controllare il valore medio (solo la parte deterministica X*beta) nel nostro campione.</span>
+            <span class="n">intercept_value</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">requested_mean</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">([</span><span class="n">a</span> <span class="o">*</span> <span class="n">c</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">betas</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">means</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">betas</span><span class="p">)])]),</span> <span class="mi">2</span><span class="p">)</span>
+
+            <span class="n">betas</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">intercept_value</span><span class="p">)</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">betas</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">betas</span><span class="p">)</span> <span class="c1"># create pandas object</span></div>
+
+
+<div class="viewcode-block" id="LR_Params.initialize_randomization"><a class="viewcode-back" href="../../implementation_lr.html#implementation_lr.lr_params.LR_Params.initialize_randomization">[docs]</a>    <span class="k">def</span> <span class="nf">initialize_randomization</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span> <span class="c1"># uso il seed per generare il primo stato. Gli altri saranno generati automaticamente</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">DatasetGenerator</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Jacopo Maccaferri, Giorgio Visani, Carlo Cannarsa.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

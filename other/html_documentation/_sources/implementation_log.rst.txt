@@ -1,0 +1,38 @@
+implementation\_log package
+===========================
+
+Submodules
+----------
+
+implementation\_log.log\_generator module
+-----------------------------------------
+
+.. automodule:: implementation_log.log_generator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+implementation\_log.log\_params module
+--------------------------------------
+
+.. automodule:: implementation_log.log_params
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+implementation\_log.log\_results module
+---------------------------------------
+
+.. automodule:: implementation_log.log_results
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: implementation_log
+   :members:
+   :undoc-members:
+   :show-inheritance:

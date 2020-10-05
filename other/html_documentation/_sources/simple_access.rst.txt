@@ -1,0 +1,22 @@
+simple\_access package
+======================
+
+Submodules
+----------
+
+simple\_access.functions module
+-------------------------------
+
+.. automodule:: simple_access.functions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: simple_access
+   :members:
+   :undoc-members:
+   :show-inheritance:

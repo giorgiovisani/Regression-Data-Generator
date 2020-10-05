@@ -1,0 +1,14 @@
+{
+"type_of_regression": "lr",
+"out_name": "test_generator_lr",
+"opt_level": "float32",
+"verbose": "False",
+"seed": 11,
+"n_variables": 5,
+"error_variance": 0,
+"n_points": 12,
+"related_vars": 3,
+"n_scales": 1,
+"requested_mean": 2,
+"unuseful_vars": 1
+}

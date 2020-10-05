@@ -1,0 +1,54 @@
+utilities package
+=================
+
+Submodules
+----------
+
+utilities.byte\_formatter module
+--------------------------------
+
+.. automodule:: utilities.byte_formatter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+utilities.correlation\_matrix\_generator module
+-----------------------------------------------
+
+.. automodule:: utilities.correlation_matrix_generator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+utilities.csv\_saver module
+---------------------------
+
+.. automodule:: utilities.csv_saver
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+utilities.gen\_details module
+-----------------------------
+
+.. automodule:: utilities.gen_details
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+utilities.sanity\_check module
+------------------------------
+
+.. automodule:: utilities.sanity_check
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: utilities
+   :members:
+   :undoc-members:
+   :show-inheritance:

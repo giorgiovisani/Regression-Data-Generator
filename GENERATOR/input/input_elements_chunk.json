@@ -1,0 +1,16 @@
+{
+"type_of_regression": "log",
+"chunk": "True",
+"chunks": 5,
+"out_name": "10",
+"opt_level": "float64",
+"verbose": "False",
+"seed": 11,
+"n_variables": 5,
+"error_variance": 0,
+"n_points": 100,
+"related_vars": 3,
+"n_scales": 1,
+"requested_odds": 2,
+"unuseful_vars": 1
+}

@@ -1,0 +1,301 @@
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>utilities package &#8212; DatasetGenerator 1.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="utilities-package">
+<h1>utilities package<a class="headerlink" href="#utilities-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-utilities.byte_formatter">
+<span id="utilities-byte-formatter-module"></span><h2>utilities.byte_formatter module<a class="headerlink" href="#module-utilities.byte_formatter" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="utilities.byte_formatter.ByteFormatter">
+<em class="property">class </em><code class="sig-prename descclassname">utilities.byte_formatter.</code><code class="sig-name descname">ByteFormatter</code><a class="reference internal" href="_modules/utilities/byte_formatter.html#ByteFormatter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utilities.byte_formatter.ByteFormatter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Static class that format bytes in a human readable form. Useful for statistics about memory usage</p>
+<dl class="method">
+<dt id="utilities.byte_formatter.ByteFormatter.format_bytes">
+<em class="property">static </em><code class="sig-name descname">format_bytes</code><span class="sig-paren">(</span><em class="sig-param">B</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utilities/byte_formatter.html#ByteFormatter.format_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utilities.byte_formatter.ByteFormatter.format_bytes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-utilities.correlation_matrix_generator">
+<span id="utilities-correlation-matrix-generator-module"></span><h2>utilities.correlation_matrix_generator module<a class="headerlink" href="#module-utilities.correlation_matrix_generator" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="utilities.correlation_matrix_generator.Correlation_Matrix_Generator">
+<em class="property">class </em><code class="sig-prename descclassname">utilities.correlation_matrix_generator.</code><code class="sig-name descname">Correlation_Matrix_Generator</code><a class="reference internal" href="_modules/utilities/correlation_matrix_generator.html#Correlation_Matrix_Generator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utilities.correlation_matrix_generator.Correlation_Matrix_Generator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Static class that generates correlation matrix and standard deviations. Useful for many steps that require those generations</p>
+<dl class="method">
+<dt id="utilities.correlation_matrix_generator.Correlation_Matrix_Generator.gen_corr_matrix">
+<em class="property">static </em><code class="sig-name descname">gen_corr_matrix</code><span class="sig-paren">(</span><em class="sig-param">seed</em>, <em class="sig-param">n_variables</em>, <em class="sig-param">related_vars</em>, <em class="sig-param">opt_level='float64'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utilities/correlation_matrix_generator.html#Correlation_Matrix_Generator.gen_corr_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utilities.correlation_matrix_generator.Correlation_Matrix_Generator.gen_corr_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_variables</strong> – number of features</p></li>
+<li><p><strong>related_vars</strong> – number of related variables</p></li>
+<li><p><strong>opt_level</strong> – str that represent the float type for casting arrays. Can be ‘float64’, ‘float32’ or ‘float16’. Default ‘float64’.</p></li>
+</ul>
+</dd>
+</dl>
+<p>‘float64’ -&gt; default (no optimization)</p>
+<p>‘float32’ -&gt; downcast to float32;</p>
+<p>‘float16’ -&gt; downcast to float16</p>
+<p>Generate a custom correlation matrix, with mixed correlated and incorrelated features</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="utilities.correlation_matrix_generator.Correlation_Matrix_Generator.gen_standard_devs">
+<em class="property">static </em><code class="sig-name descname">gen_standard_devs</code><span class="sig-paren">(</span><em class="sig-param">seed</em>, <em class="sig-param">n_variables</em>, <em class="sig-param">related_vars</em>, <em class="sig-param">n_scales</em>, <em class="sig-param">opt_level='float64'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utilities/correlation_matrix_generator.html#Correlation_Matrix_Generator.gen_standard_devs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utilities.correlation_matrix_generator.Correlation_Matrix_Generator.gen_standard_devs" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_variables</strong> – number of features</p></li>
+<li><p><strong>related_vars</strong> – number of related variables</p></li>
+<li><p><strong>n_scales</strong> – number of scales</p></li>
+<li><p><strong>opt_level</strong> – str that represent the float type for casting arrays. Can be ‘float64’, ‘float32’ or ‘float16’. Default ‘float64’</p></li>
+</ul>
+</dd>
+</dl>
+<p>‘float64’ -&gt; default (no optimization)</p>
+<p>‘float32’ -&gt; downcast to float32</p>
+<p>‘float16’ -&gt; downcast to float16</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-utilities.csv_saver">
+<span id="utilities-csv-saver-module"></span><h2>utilities.csv_saver module<a class="headerlink" href="#module-utilities.csv_saver" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="utilities.csv_saver.Csv_Results_Saver">
+<em class="property">class </em><code class="sig-prename descclassname">utilities.csv_saver.</code><code class="sig-name descname">Csv_Results_Saver</code><span class="sig-paren">(</span><em class="sig-param">dir_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utilities/csv_saver.html#Csv_Results_Saver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utilities.csv_saver.Csv_Results_Saver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="abstract_classes.html#abstract_classes.dgp_results_saver.DGP_Results_Saver" title="abstract_classes.dgp_results_saver.DGP_Results_Saver"><code class="xref py py-class docutils literal notranslate"><span class="pre">abstract_classes.dgp_results_saver.DGP_Results_Saver</span></code></a></p>
+<p>Implementation of DGP_Result_Saver, useful to save various .csv files from generated results</p>
+<dl class="method">
+<dt id="utilities.csv_saver.Csv_Results_Saver.save_all">
+<code class="sig-name descname">save_all</code><span class="sig-paren">(</span><em class="sig-param">params=None</em>, <em class="sig-param">result=None</em>, <em class="sig-param">compression=False</em>, <em class="sig-param">compr_type=None</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">multi_proc=False</em>, <em class="sig-param">feature_analysis=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utilities/csv_saver.html#Csv_Results_Saver.save_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utilities.csv_saver.Csv_Results_Saver.save_all" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>params</strong> – object of class DGP_Params</p></li>
+<li><p><strong>result</strong> – object of class DGP_Results</p></li>
+<li><p><strong>compression</strong> – bool. Set true if you want compression (must not have compr_type = None)</p></li>
+<li><p><strong>compr_type</strong> – str that represent the compression type. Works only if compression is set to True. Can be 3 values:</p></li>
+</ul>
+</dd>
+</dl>
+<p>‘gz’ -&gt; using gunzip compression, file will be saved as &lt;filename&gt;.csv.gz</p>
+<p>‘bz’ -&gt; using bzip compression, file will be saved as &lt;filename&gt;.csv.bz</p>
+<p>‘xz’ -&gt; using xz compression, file will be saved as &lt;filename&gt;.csv.xz</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>verbose</strong> – bool, disable if you don’t want verbose output</p></li>
+<li><p><strong>multi_proc</strong> – bool, works only if feature_analysis is true. If set to true executes all tasks with multiprocessing (experimental)</p></li>
+<li><p><strong>feature_analysis</strong> – if true, will save also analysis on the features</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="utilities.csv_saver.Csv_Results_Saver.save_dataframe">
+<code class="sig-name descname">save_dataframe</code><span class="sig-paren">(</span><em class="sig-param">dataframe</em>, <em class="sig-param">filename</em>, <em class="sig-param">mode='w'</em>, <em class="sig-param">index=False</em>, <em class="sig-param">header=False</em>, <em class="sig-param">sep='</em>, <em class="sig-param">'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utilities/csv_saver.html#Csv_Results_Saver.save_dataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utilities.csv_saver.Csv_Results_Saver.save_dataframe" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> – pandas.Dataframe that will be saved</p></li>
+<li><p><strong>filename</strong> – filename where file will be saved</p></li>
+<li><p><strong>mode</strong> – ‘w’ for writing, ‘a’ for append. Default ‘w’</p></li>
+<li><p><strong>index</strong> – bool, save index of dataframe</p></li>
+<li><p><strong>header</strong> – bool, save header of dataframe</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-utilities.gen_details">
+<span id="utilities-gen-details-module"></span><h2>utilities.gen_details module<a class="headerlink" href="#module-utilities.gen_details" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="utilities.gen_details.Generation_Details">
+<em class="property">class </em><code class="sig-prename descclassname">utilities.gen_details.</code><code class="sig-name descname">Generation_Details</code><span class="sig-paren">(</span><em class="sig-param">start_ts</em>, <em class="sig-param">end_ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utilities/gen_details.html#Generation_Details"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utilities.gen_details.Generation_Details" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Useful generation details
+start_ts: timestamp of generation at start
+end_ts: timestamp of generation at end</p>
+<p>When invoked constructor, there will be stored 2 more attributes:
+platform_name: OS name
+user: who logged in the OS</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-utilities.sanity_check">
+<span id="utilities-sanity-check-module"></span><h2>utilities.sanity_check module<a class="headerlink" href="#module-utilities.sanity_check" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="utilities.sanity_check.Feature_Analyzer_MultiProc_Executor">
+<em class="property">class </em><code class="sig-prename descclassname">utilities.sanity_check.</code><code class="sig-name descname">Feature_Analyzer_MultiProc_Executor</code><span class="sig-paren">(</span><em class="sig-param">features=None</em>, <em class="sig-param">dir_path=None</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">fa=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utilities/sanity_check.html#Feature_Analyzer_MultiProc_Executor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utilities.sanity_check.Feature_Analyzer_MultiProc_Executor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Class that runs analysis in multiprocessing</p>
+<dl class="method">
+<dt id="utilities.sanity_check.Feature_Analyzer_MultiProc_Executor.run_processes">
+<code class="sig-name descname">run_processes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/utilities/sanity_check.html#Feature_Analyzer_MultiProc_Executor.run_processes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utilities.sanity_check.Feature_Analyzer_MultiProc_Executor.run_processes" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method runs parallel processes</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="utilities.sanity_check.Sanity_Check">
+<em class="property">class </em><code class="sig-prename descclassname">utilities.sanity_check.</code><code class="sig-name descname">Sanity_Check</code><a class="reference internal" href="_modules/utilities/sanity_check.html#Sanity_Check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utilities.sanity_check.Sanity_Check" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="abstract_classes.html#abstract_classes.dgp_sanity_check.DGP_Sanity_Check" title="abstract_classes.dgp_sanity_check.DGP_Sanity_Check"><code class="xref py py-class docutils literal notranslate"><span class="pre">abstract_classes.dgp_sanity_check.DGP_Sanity_Check</span></code></a></p>
+<dl class="method">
+<dt id="utilities.sanity_check.Sanity_Check.plot_all">
+<code class="sig-name descname">plot_all</code><span class="sig-paren">(</span><em class="sig-param">features=None</em>, <em class="sig-param">dir_path=None</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">multi_proc=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utilities/sanity_check.html#Sanity_Check.plot_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utilities.sanity_check.Sanity_Check.plot_all" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="utilities.sanity_check.Sanity_Check.plot_autocorr_function">
+<code class="sig-name descname">plot_autocorr_function</code><span class="sig-paren">(</span><em class="sig-param">features=None</em>, <em class="sig-param">dir_path=None</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">return_figs=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utilities/sanity_check.html#Sanity_Check.plot_autocorr_function"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utilities.sanity_check.Sanity_Check.plot_autocorr_function" title="Permalink to this definition">¶</a></dt>
+<dd><p>Autocorrelation function for 20 lags</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="utilities.sanity_check.Sanity_Check.plot_density_hist">
+<code class="sig-name descname">plot_density_hist</code><span class="sig-paren">(</span><em class="sig-param">features=None</em>, <em class="sig-param">dir_path=None</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">return_figs=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utilities/sanity_check.html#Sanity_Check.plot_density_hist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utilities.sanity_check.Sanity_Check.plot_density_hist" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>features</strong> – pandas Dataframe</p></li>
+<li><p><strong>dir_path</strong> – (optional) directory path where to save files</p></li>
+<li><p><strong>verbose</strong> – disable if you don’t want verbose output</p></li>
+<li><p><strong>return_figs</strong> – if set to true will return all the figs. It can consume a lot of memory</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="utilities.sanity_check.Sanity_Check.plot_p2p_indip">
+<code class="sig-name descname">plot_p2p_indip</code><span class="sig-paren">(</span><em class="sig-param">features=None</em>, <em class="sig-param">dir_path=None</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">return_figs=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utilities/sanity_check.html#Sanity_Check.plot_p2p_indip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utilities.sanity_check.Sanity_Check.plot_p2p_indip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Independence between variables 2-2</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="utilities.sanity_check.Sanity_Check.plot_spearman_correlation">
+<code class="sig-name descname">plot_spearman_correlation</code><span class="sig-paren">(</span><em class="sig-param">features=None</em>, <em class="sig-param">dir_path=None</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">return_figs=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utilities/sanity_check.html#Sanity_Check.plot_spearman_correlation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utilities.sanity_check.Sanity_Check.plot_spearman_correlation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Spearman correlation</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="utilities.sanity_check.Sanity_Check.plot_value_indip">
+<code class="sig-name descname">plot_value_indip</code><span class="sig-paren">(</span><em class="sig-param">features=None</em>, <em class="sig-param">dir_path=None</em>, <em class="sig-param">verbose=False</em>, <em class="sig-param">return_figs=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/utilities/sanity_check.html#Sanity_Check.plot_value_indip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#utilities.sanity_check.Sanity_Check.plot_value_indip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plot each value against the subsequent one</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-utilities">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-utilities" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">DatasetGenerator</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, Jacopo Maccaferri, Giorgio Visani, Carlo Cannarsa.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 2.4.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/utilities.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

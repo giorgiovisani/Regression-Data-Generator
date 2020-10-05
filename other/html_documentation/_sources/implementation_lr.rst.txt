@@ -1,0 +1,38 @@
+implementation\_lr package
+==========================
+
+Submodules
+----------
+
+implementation\_lr.lr\_generator module
+---------------------------------------
+
+.. automodule:: implementation_lr.lr_generator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+implementation\_lr.lr\_params module
+------------------------------------
+
+.. automodule:: implementation_lr.lr_params
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+implementation\_lr.lr\_results module
+-------------------------------------
+
+.. automodule:: implementation_lr.lr_results
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: implementation_lr
+   :members:
+   :undoc-members:
+   :show-inheritance:
